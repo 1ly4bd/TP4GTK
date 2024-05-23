@@ -1,0 +1,75 @@
+/* Style for the main window */
+window {
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+/* Style for the buttons */
+button {
+    background-color: #5bc0de;
+    color: #333;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #31b0d5;
+    border-color: #269abc;
+}
+
+/* Style for the entry (text input) */
+entry {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fff;
+    color: #333;
+}
+
+entry:focus {
+    border-color: #333;
+    box-shadow: 0 0 5px rgba(51, 51, 51, 1);
+}
+
+/* Style for the drawing area */
+drawingarea {
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+
+/* Style for the message view */
+textview {
+    background-color: #e9ecef;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+scrolledwindow textview {
+    background-color: transparent;
+    border: none;
+}
+
+/* Style for the frame around the message view */
+frame {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    background-color: #e9ecef;
+}
+
+frame label {
+    color: #333;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+
+
