@@ -213,8 +213,8 @@ unsigned int tailleMemoireClassique(T_Arbre abr) {
 void tailleMemoire(T_Arbre abr) {
     unsigned int tailleIntervalles = tailleMemoireIntervalles(abr);
     unsigned int tailleClassique = tailleMemoireClassique(abr);
-    unsigned int tailleSommetClassique = sizeof(T_Sommet);
-    unsigned int tailleSommetIntervalles = sizeof(T_Sommet2);
+    unsigned int tailleSommetClassique = sizeof(T_Sommet2);
+    unsigned int tailleSommetIntervalles = sizeof(T_Sommet);
     double rapport = (1-((double)tailleIntervalles / tailleClassique)) * 100;
     append_to_message_view(g_strdup_printf("\n"));
     append_to_message_view(g_strdup_printf("La representation par intervalles occupe %.2f%% de moins que la representation classique.\n", rapport));
