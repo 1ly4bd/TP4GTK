@@ -113,7 +113,7 @@ T_Arbre supprimerElement(T_Arbre abr, int element) {
     }
     T_Sommet *elementASupprimer = rechercherElement(abr, element);
     if (elementASupprimer == NULL) {
-        append_to_message_view(g_strdup_printf("L'element %d n'existe pas dans l'arbre. Suppression impossible.\n", element));
+        append_to_message_view(g_strdup_printf("Erreur: L'element %d n'existe pas dans l'arbre. Suppression impossible.\n", element));
         return abr;
     }
     if (element < abr->borneInf) {
@@ -123,8 +123,7 @@ T_Arbre supprimerElement(T_Arbre abr, int element) {
     } else {
         // PROBLEME POUR CE CAS QUAND ABR A DES FILS, logique totalement fausse, tester en créeant 8-8, 4-4, 6-6 puis 2-2 de supp 4
        if (abr->borneInf == abr->borneSup) {
-    append_to_message_view(g_strdup_printf("A supprimer: [%d; %d]\n", abr->borneInf, abr->borneSup));
-    if (abr->borneInf == element) {
+        if (abr->borneInf == element) {
         T_Sommet *nouvelleRacine = NULL;
         if (abr->filsGauche == NULL) {
             nouvelleRacine = abr->filsDroit;
@@ -139,7 +138,7 @@ T_Arbre supprimerElement(T_Arbre abr, int element) {
                     nouvelleRacine = abr->filsDroit;
                 }
                 free(abr);
-                append_to_message_view(g_strdup_printf("Element %d supprime.\n", element)); // Affichage d'un message indiquant la suppression réussie
+                append_to_message_view(g_strdup_printf("Suppression de %d.\n", element)); // Affichage d'un message indiquant la suppression réussie
                 return nouvelleRacine;
             }
         } else {
@@ -148,31 +147,25 @@ T_Arbre supprimerElement(T_Arbre abr, int element) {
             } else if (element == abr->borneSup) {
                 abr->borneSup--;
             } else {
-                append_to_message_view(g_strdup_printf("Suppression de %d et separation du sommet [%d; %d]\n", element, abr->borneInf, abr->borneSup));
                 // Créer un nouveau sommet pour [borneInf, element - 1]
                 T_Sommet *nouveauGauche = creerSommet(abr->borneInf);
                 nouveauGauche->borneSup = element - 1;
                 nouveauGauche->filsGauche = abr->filsGauche;
-                append_to_message_view(g_strdup_printf("Premier sommet genere par la separation: [%d; %d]\n", nouveauGauche->borneInf, nouveauGauche->borneSup));
 
                 // Créer un nouveau sommet pour [element + 1, borneSup]
                 T_Sommet *nouveauDroit = creerSommet(element + 1);
                 nouveauDroit->borneSup = abr->borneSup;
                 nouveauDroit->filsDroit = abr->filsDroit;
-                append_to_message_view(g_strdup_printf("Second sommet genere par la separation: [%d; %d]\n", nouveauDroit->borneInf, nouveauDroit->borneSup));
 
                 int x;
                 for (x = nouveauDroit->borneInf; x <= nouveauDroit->borneSup; x++) {
                     nouveauGauche = insererElement(nouveauGauche, x);
                 }
-                append_to_message_view(g_strdup_printf("Second sommet: [%d; %d]\n", nouveauDroit->borneInf, nouveauDroit->borneSup));
                 if (abr->filsGauche != NULL) {
-                        append_to_message_view(g_strdup_printf("Fils gauche de abr: [%d; %d]\n", abr->filsGauche->borneInf, abr->filsGauche->borneSup));
                         nouveauGauche->filsGauche = abr->filsGauche;
 
                 }
                 if (abr->filsGauche != NULL) {
-                        append_to_message_view(g_strdup_printf("Fils droit de abr: [%d; %d]\n", abr->filsDroit->borneInf, abr->filsDroit->borneSup));
                         nouveauDroit->filsDroit = abr->filsDroit;
 
                 }

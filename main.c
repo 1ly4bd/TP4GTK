@@ -87,7 +87,24 @@ typedef struct {
 GArray *noeudsGraphiques = NULL;
 
 static void dessiner_arbre(cairo_t *cr, T_Arbre abr, double x, double y, double x_offset, double y_offset) {
+    // Vérifier si l'arbre est vide
     if (abr == NULL) {
+        // Définir le texte et sa taille
+        char *message = "Arbre vide";
+        double font_size = 16;
+
+        // Centrer le texte
+        cairo_set_font_size(cr, font_size);
+        cairo_select_font_face(cr, "sans-serif", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+        cairo_text_extents_t te;
+        cairo_text_extents(cr, message, &te);
+        double text_center_x = x - te.width / 2.0;
+        double text_center_y = y + 125;
+
+        // Afficher le message
+        cairo_set_source_rgba(cr, 0.2, 0.2, 0.2, 0.5); // Couleur du texte
+        cairo_move_to(cr, text_center_x, text_center_y);
+        cairo_show_text(cr, message);
         return;
     }
 
@@ -204,24 +221,26 @@ static GtkWidget *darea = NULL;
 
 // Fonction pour insérer un élément dans l'arbre
 static void inserer_un_element(GtkWidget *widget, gpointer entry) {
-    // Sauvegardez l'état actuel de l'arbre
-    sauvegarder_etat_precedent();
-
     const char *text = gtk_entry_get_text(GTK_ENTRY(entry));
     if (strlen(text) == 0) {
         append_to_message_view(g_strdup_printf("Erreur : Veuillez entrer un entier.\n"));
+        gtk_entry_set_text(GTK_ENTRY(entry), "");
         return;
     }
     char *endptr;
     long element = strtol(text, &endptr, 10);
     if (*endptr != '\0') {
         append_to_message_view(g_strdup_printf("Erreur : Veuillez entrer un entier valide.\n"));
+        gtk_entry_set_text(GTK_ENTRY(entry), "");
         return;
     }
     if (rechercherElement(abr, element) != NULL) {
-        append_to_message_view(g_strdup_printf("L'element %d est deja present dans l'arbre.\n", element));
+        append_to_message_view(g_strdup_printf("Erreur: L'element %ld est deja present dans l'arbre.\n", element));
+        gtk_entry_set_text(GTK_ENTRY(entry), "");
         return;
     }
+    // Sauvegardez l'état actuel de l'arbre
+    sauvegarder_etat_precedent();
     abr = insererElement(abr, (int)element);
     append_to_message_view(g_strdup_printf("Element %ld insere.\n", element));
     gtk_entry_set_text(GTK_ENTRY(entry), "");
@@ -230,25 +249,25 @@ static void inserer_un_element(GtkWidget *widget, gpointer entry) {
 
 // Fonction pour supprimer un élément de l'arbre
 static void supprimer_un_element(GtkWidget *widget, gpointer entry) {
-    // Sauvegardez l'état actuel de l'arbre
-    sauvegarder_etat_precedent();
-
     const char *text = gtk_entry_get_text(GTK_ENTRY(entry));
     if (strlen(text) == 0) {
         append_to_message_view(g_strdup_printf("Erreur : Veuillez entrer un entier.\n"));
+        gtk_entry_set_text(GTK_ENTRY(entry), "");
         return;
     }
     char *endptr;
     long element = strtol(text, &endptr, 10);
     if (*endptr != '\0') {
         append_to_message_view(g_strdup_printf("Erreur : Veuillez entrer un entier valide.\n"));
+        gtk_entry_set_text(GTK_ENTRY(entry), "");
         return;
     }
+    // Sauvegardez l'état actuel de l'arbre
+    sauvegarder_etat_precedent();
     abr = supprimerElement(abr, (int)element);
     gtk_entry_set_text(GTK_ENTRY(entry), "");
     gtk_widget_queue_draw(darea);
 }
-
 
 // Fonction pour restaurer l'état précédent de l'arbre
 static void retourner_etat_precedent(GtkWidget *widget, gpointer data) {
@@ -283,6 +302,18 @@ static void avancer_etat_suivant(GtkWidget *widget, gpointer data) {
     }
 }
 
+static gboolean on_key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
+    if ((event->state & GDK_CONTROL_MASK) && (event->keyval == GDK_KEY_z)) {
+        // Ctrl + Z pressed, trigger undo function
+        retourner_etat_precedent(widget, user_data);
+        return TRUE; // Event handled
+    } else if ((event->state & GDK_CONTROL_MASK) && (event->keyval == GDK_KEY_y)) {
+        // Ctrl + Y pressed, trigger redo function
+        avancer_etat_suivant(widget, user_data);
+        return TRUE; // Event handled
+    }
+    return FALSE; // Event not handled
+}
 
 static void rechercher_un_element(GtkWidget *widget, gpointer entry) {
     const char *text = gtk_entry_get_text(GTK_ENTRY(entry));
@@ -291,7 +322,7 @@ static void rechercher_un_element(GtkWidget *widget, gpointer entry) {
     if (resultatRecherche != NULL) {
         append_to_message_view(g_strdup_printf("Element trouve dans l'intervalle [%d; %d].\n", resultatRecherche->borneInf, resultatRecherche->borneSup));
     } else {
-        append_to_message_view(g_strdup_printf("Element non trouve.\n"));
+        append_to_message_view(g_strdup_printf("Erreur: Element non trouve.\n"));
         gtk_entry_set_text(GTK_ENTRY(entry), "");
     }
 }
@@ -320,7 +351,7 @@ static void afficher_racine(GtkWidget *widget, gpointer data) {
         append_to_message_view(g_strdup_printf("Racine de l'arbre: [%d; %d]\n", abr->borneInf, abr->borneSup));
     } else {
         append_to_message_view(g_strdup_printf("\n"));
-        append_to_message_view(g_strdup_printf("L'arbre est vide, pas de racine a afficher.\n"));
+        append_to_message_view(g_strdup_printf("Erreur: L'arbre est vide, pas de racine a afficher.\n"));
     }
 }
 
@@ -344,7 +375,7 @@ static void afficher_pere(GtkWidget *widget, gpointer entry) {
         append_to_message_view(g_strdup_printf("Pere de l'element %ld : [%d; %d].\n", element, pere->borneInf, pere->borneSup));
     } else {
         append_to_message_view(g_strdup_printf("\n"));
-        append_to_message_view(g_strdup_printf("Element non trouve ou racine de l'arbre.\n"));
+        append_to_message_view(g_strdup_printf("Erreur: Element non trouve ou racine de l'arbre.\n"));
     }
     gtk_entry_set_text(GTK_ENTRY(entry), "");
 }
@@ -369,7 +400,7 @@ static void afficher_niveau(GtkWidget *widget, gpointer entry) {
         append_to_message_view(g_strdup_printf("Niveau de l'element %ld : %d.\n", element, niveau));
     } else {
         append_to_message_view(g_strdup_printf("\n"));
-        append_to_message_view(g_strdup_printf("Element non trouve.\n"));
+        append_to_message_view(g_strdup_printf("Erreur: Element non trouve.\n"));
     }
     gtk_entry_set_text(GTK_ENTRY(entry), "");
 }
@@ -483,6 +514,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
     // Créez une nouvelle boîte horizontale pour inclure le bouton de recentrage
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 5);
+    gtk_widget_set_visible(hbox, FALSE); // Rendre la boîte horizontale invisible (marche pas)
 
     // Création du bouton de recentrage
     button = gtk_button_new_with_label("Avancer");
@@ -519,6 +551,8 @@ static void activate(GtkApplication *app, gpointer user_data) {
     transparent.blue = 0.0;
     transparent.alpha = 0.0;
     gtk_widget_override_background_color(text_view, GTK_STATE_FLAG_NORMAL, &transparent);
+
+    g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press_event), NULL);
 
     // Charger le fichier CSS
     GtkCssProvider *provider;

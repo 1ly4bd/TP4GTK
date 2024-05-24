@@ -1,75 +1,66 @@
-/* Style for the main window */
 window {
-    background-color: #f0f0f0;
-    font-family: Arial, sans-serif;
-    color: #333;
+    background-color: #f5f5f5;
+    color: #000000;
+    font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Style for the buttons */
 button {
-    background-color: #5bc0de;
-    color: #333;
-    border: 1px solid #333;
-    border-radius: 4px;
-    padding: 8px 12px;
-    font-size: 14px;
-    font-weight: bold;
+    background-color: #ffffff; /* Couleur de fond blanche */
+    border: 2px solid #333333; /* Contour de 2 pixels de couleur #333333 */
+    border-radius: 0; /* Pas de bord arrondi pour un bouton rectangulaire */
+    color: #333333; /* Couleur du texte */
+    padding: 10px 20px; /* Ajustez le padding selon vos besoins */
 }
 
 button:hover {
-    background-color: #31b0d5;
-    border-color: #269abc;
+    background-color: #f0f0f0; /* Couleur de fond lors du survol */
 }
 
-/* Style for the entry (text input) */
+button:active {
+    background-color: #e0e0e0; /* Couleur de fond lors du clic */
+}
+
 entry {
-    padding: 6px 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #cccccc;
+    border-radius: 2px;
+    padding: 5px;
     font-size: 14px;
-    background-color: #fff;
-    color: #333;
 }
 
 entry:focus {
-    border-color: #269abc;
-    box-shadow: 0 0 5px rgba(38, 154, 188, 1);
+    border-color: #333;
+    box-shadow: 0 0 5px rgba(204, 204, 204, 1);
 }
 
-/* Style for the drawing area */
-drawingarea {
-    background-color: #fff;
-    border: 1px solid #ccc;
-}
-
-/* Style for the message view */
 textview {
-    background-color: #e9ecef;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 10px;
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #cccccc;
+    border-radius: 2px;
+    padding: 5px;
     font-size: 14px;
-    color: #333;
 }
 
-scrolledwindow textview {
+textview text {
     background-color: transparent;
-    border: none;
 }
 
-/* Style for the frame around the message view */
 frame {
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 1px solid #cccccc;
+    border-radius: 2px;
     padding: 10px;
-    background-color: #e9ecef;
+    background-color: #ffffff;
 }
 
-frame label {
-    color: #333;
+frame > label {
     font-size: 16px;
     font-weight: bold;
+    color: #333333;
 }
 
-
-
+drawingarea {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+}
