@@ -211,11 +211,16 @@ unsigned int tailleMemoireClassique(T_Arbre abr) {
 void tailleMemoire(T_Arbre abr) {
     unsigned int tailleIntervalles = tailleMemoireIntervalles(abr);
     unsigned int tailleClassique = tailleMemoireClassique(abr);
+    unsigned int tailleSommetClassique = sizeof(T_Sommet);
+    unsigned int tailleSommetIntervalles = sizeof(T_Sommet2);
     double rapport = (1-((double)tailleIntervalles / tailleClassique)) * 100;
+    append_to_message_view(g_strdup_printf("\n"));
     append_to_message_view(g_strdup_printf("La representation par intervalles occupe %.2f%% de moins que la representation classique.\n", rapport));
     append_to_message_view(g_strdup_printf("Nombre d'octets gagnes par la representation par intervalles: %d\n", tailleClassique - tailleIntervalles));
     append_to_message_view(g_strdup_printf("Taille memoire de l'arbre (version classique): %u octets\n", tailleClassique));
     append_to_message_view(g_strdup_printf("Taille memoire de l'arbre (version intervalles): %u octets\n", tailleIntervalles));
+    append_to_message_view(g_strdup_printf("Taille d'un sommet par intervalle %u.\n", tailleSommetIntervalles));
+    append_to_message_view(g_strdup_printf("Taille d'un sommet normal %u.\n", tailleSommetClassique));
 }
 
 T_Arbre obtenirRacine(T_Arbre abr) {

@@ -4,12 +4,28 @@
 #include "tp4.h"
 #include "message_utils.h"
 
-T_Arbre abr = NULL; // Initialisation de l'arbre à NULL
-// Déclarez un tableau dynamique pour stocker les états précédents de l'arbre
+T_Arbre abr = NULL;
 GArray *previous_abrs = NULL;
 GArray *next_abrs = NULL;
-
 GtkWidget *text_view = NULL;
+GArray *noeudsGraphiques = NULL;
+static GtkWidget *darea = NULL;
+// Déclaration des variables globales pour le zoom et le panoramique
+static double zoom_level = 1.0;
+static double offset_x = 0;
+static double offset_y = 0;
+static double last_x = 0;
+static double last_y = 0;
+static gboolean dragging = FALSE;
+static GtkWidget *scrolled_window = NULL;
+
+typedef struct {
+    double x;
+    double y;
+    T_Sommet *sommet;
+} NoeudGraphique;
+
+
 
 // Fonction pour copier un arbre
 T_Arbre copierArbre(T_Arbre abr) {
@@ -34,8 +50,6 @@ T_Arbre copierArbre(T_Arbre abr) {
 
     return copie;
 }
-
-// Dans le fichier source main.c
 
 void supprimerArbre(T_Arbre abr) {
     if (abr == NULL) {
@@ -67,24 +81,6 @@ void sauvegarder_etat_suivant() {
     T_Arbre copie = copierArbre(abr);
     g_array_append_val(next_abrs, copie);
 }
-
-
-// Déclaration des variables globales pour le zoom et le panoramique
-static double zoom_level = 1.0;
-static double offset_x = 0;
-static double offset_y = 0;
-static double last_x = 0;
-static double last_y = 0;
-static gboolean dragging = FALSE;
-static GtkWidget *scrolled_window = NULL;
-
-typedef struct {
-    double x;
-    double y;
-    T_Sommet *sommet;
-} NoeudGraphique;
-
-GArray *noeudsGraphiques = NULL;
 
 static void dessiner_arbre(cairo_t *cr, T_Arbre abr, double x, double y, double x_offset, double y_offset) {
     // Vérifier si l'arbre est vide
@@ -217,8 +213,6 @@ static gboolean on_double_click_event(GtkWidget *widget, GdkEventButton *event, 
     return FALSE;
 }
 
-static GtkWidget *darea = NULL;
-
 // Fonction pour insérer un élément dans l'arbre
 static void inserer_un_element(GtkWidget *widget, gpointer entry) {
     const char *text = gtk_entry_get_text(GTK_ENTRY(entry));
@@ -242,6 +236,7 @@ static void inserer_un_element(GtkWidget *widget, gpointer entry) {
     // Sauvegardez l'état actuel de l'arbre
     sauvegarder_etat_precedent();
     abr = insererElement(abr, (int)element);
+    append_to_message_view(g_strdup_printf("\n"));
     append_to_message_view(g_strdup_printf("Element %ld insere.\n", element));
     gtk_entry_set_text(GTK_ENTRY(entry), "");
     gtk_widget_queue_draw(darea);
@@ -411,6 +406,14 @@ static void clear_message_view() {
     gtk_text_buffer_set_text(buffer, "", -1);
 }
 
+static void recentrer_arbre(GtkWidget *widget, gpointer data) {
+    // Réinitialise les valeurs de décalage pour recentrer l'arbre
+    offset_x = 0;
+    offset_y = 0;
+    // Redessine l'arbre avec le nouveau décalage
+    gtk_widget_queue_draw(darea);
+}
+
 static void reinitialiser_arbre(GtkWidget *widget, gpointer data) {
     // Effacer le contenu de la zone de texte
     clear_message_view();
@@ -418,16 +421,9 @@ static void reinitialiser_arbre(GtkWidget *widget, gpointer data) {
     // Réinitialiser l'arbre
     supprimerArbre(abr);
     abr = NULL;
+    recentrer_arbre(darea, abr);
     gtk_widget_queue_draw(darea);
     append_to_message_view(g_strdup_printf("Arbre reinitialise.\n"));
-}
-
-static void recentrer_arbre(GtkWidget *widget, gpointer data) {
-    // Réinitialise les valeurs de décalage pour recentrer l'arbre
-    offset_x = 0;
-    offset_y = 0;
-    // Redessine l'arbre avec le nouveau décalage
-    gtk_widget_queue_draw(darea);
 }
 
 static void activate(GtkApplication *app, gpointer user_data) {
