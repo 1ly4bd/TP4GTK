@@ -32,8 +32,8 @@ entry {
 }
 
 entry:focus {
-    border-color: #333;
-    box-shadow: 0 0 5px rgba(51, 51, 51, 1);
+    border-color: #269abc;
+    box-shadow: 0 0 5px rgba(38, 154, 188, 1);
 }
 
 /* Style for the drawing area */
