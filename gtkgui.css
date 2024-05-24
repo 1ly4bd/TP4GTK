@@ -5,19 +5,19 @@ window {
 }
 
 button {
-    background-color: #ffffff; /* Couleur de fond blanche */
-    border: 2px solid #333333; /* Contour de 2 pixels de couleur #333333 */
-    border-radius: 0; /* Pas de bord arrondi pour un bouton rectangulaire */
-    color: #333333; /* Couleur du texte */
-    padding: 10px 20px; /* Ajustez le padding selon vos besoins */
+    background-color: #ffffff;
+    border: 2px solid #333333;
+    border-radius: 0;
+    color: #333333;
+    padding: 10px 20px;
 }
 
 button:hover {
-    background-color: #f0f0f0; /* Couleur de fond lors du survol */
+    background-color: #f0f0f0;
 }
 
 button:active {
-    background-color: #e0e0e0; /* Couleur de fond lors du clic */
+    background-color: #e0e0e0;
 }
 
 entry {

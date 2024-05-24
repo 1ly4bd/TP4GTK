@@ -10,7 +10,7 @@ GArray *next_abrs = NULL;
 GtkWidget *text_view = NULL;
 GArray *noeudsGraphiques = NULL;
 static GtkWidget *darea = NULL;
-// Déclaration des variables globales pour le zoom et le panoramique
+// Déclaration des variables globales pour le zoom (qui ne marche pas pour l'instant) et le panoramique
 static double zoom_level = 1.0;
 static double offset_x = 0;
 static double offset_y = 0;
@@ -25,9 +25,6 @@ typedef struct {
     T_Sommet *sommet;
 } NoeudGraphique;
 
-
-
-// Fonction pour copier un arbre
 T_Arbre copierArbre(T_Arbre abr) {
     if (abr == NULL) {
         return NULL;
@@ -40,11 +37,11 @@ T_Arbre copierArbre(T_Arbre abr) {
         exit(EXIT_FAILURE);
     }
 
-    // Copiez les données du sommet
+    // Copier les données du sommet
     copie->borneInf = abr->borneInf;
     copie->borneSup = abr->borneSup;
 
-    // Copiez les sous-arbres
+    // Copier les sous-arbres
     copie->filsGauche = copierArbre(abr->filsGauche);
     copie->filsDroit = copierArbre(abr->filsDroit);
 
@@ -63,21 +60,21 @@ void supprimerArbre(T_Arbre abr) {
 
 // Fonction pour sauvegarder l'état actuel de l'arbre
 void sauvegarder_etat_precedent() {
-    // Créez un tableau dynamique s'il n'existe pas encore
+    // Créer un tableau dynamique s'il n'existe pas encore
     if (previous_abrs == NULL) {
         previous_abrs = g_array_new(FALSE, FALSE, sizeof(T_Arbre));
     }
-    // Faites une copie de l'arbre actuel et ajoutez-la au tableau
+    // Faire une copie de l'arbre actuel et ajoutez-la au tableau
     T_Arbre copie = copierArbre(abr);
     g_array_append_val(previous_abrs, copie);
 }
 
 void sauvegarder_etat_suivant() {
-    // Créez un tableau dynamique s'il n'existe pas encore
+    // Créer un tableau dynamique s'il n'existe pas encore
     if (next_abrs == NULL) {
         next_abrs = g_array_new(FALSE, FALSE, sizeof(T_Arbre));
     }
-    // Faites une copie de l'arbre actuel et ajoutez-la au tableau
+    // Faire une copie de l'arbre actuel et ajoutez-la au tableau
     T_Arbre copie = copierArbre(abr);
     g_array_append_val(next_abrs, copie);
 }
@@ -104,7 +101,7 @@ static void dessiner_arbre(cairo_t *cr, T_Arbre abr, double x, double y, double 
         return;
     }
 
-    // Enregistrez les coordonnées et le sommet associé
+    // Enregistrer les coordonnées et le sommet associé
     NoeudGraphique noeud = { x, y, abr };
     g_array_append_val(noeudsGraphiques, noeud);
 
@@ -236,8 +233,9 @@ static void inserer_un_element(GtkWidget *widget, gpointer entry) {
         gtk_entry_set_text(GTK_ENTRY(entry), "");
         return;
     }
-    // Sauvegardez l'état actuel de l'arbre
+    // Sauvegarder l'état actuel de l'arbre
     sauvegarder_etat_precedent();
+
     abr = insererElement(abr, (int)element);
     append_to_message_view(g_strdup_printf("\n"));
     append_to_message_view(g_strdup_printf("Element %ld insere.\n", element));
@@ -262,8 +260,9 @@ static void supprimer_un_element(GtkWidget *widget, gpointer entry) {
         gtk_entry_set_text(GTK_ENTRY(entry), "");
         return;
     }
-    // Sauvegardez l'état actuel de l'arbre
+    // Sauvegarder l'état actuel de l'arbre
     sauvegarder_etat_precedent();
+
     abr = supprimerElement(abr, (int)element);
     gtk_entry_set_text(GTK_ENTRY(entry), "");
     gtk_widget_queue_draw(darea);
@@ -272,47 +271,47 @@ static void supprimer_un_element(GtkWidget *widget, gpointer entry) {
 // Fonction pour restaurer l'état précédent de l'arbre
 static void retourner_etat_precedent(GtkWidget *widget, gpointer data) {
     if (previous_abrs != NULL && previous_abrs->len > 0) {
-        // Sauvegardez l'état actuel dans le tableau des états suivants
+        // Sauvegarder l'état actuel dans le tableau des états suivants
         sauvegarder_etat_suivant();
 
-        // Libérez l'arbre actuel
+        // Libérer l'arbre actuel
         supprimerArbre(abr);
-        // Restaurez l'arbre à partir du dernier état sauvegardé
+        // Restaurer l'arbre à partir du dernier état sauvegardé
         abr = g_array_index(previous_abrs, T_Arbre, previous_abrs->len - 1);
-        // Supprimez l'état restauré du tableau
+        // Supprimer l'état restauré du tableau
         g_array_remove_index(previous_abrs, previous_abrs->len - 1);
-        // Redessinez l'arbre avec l'état précédent
+        // Redessiner l'arbre avec l'état précédent
         gtk_widget_queue_draw(darea);
     }
 }
 
 static void avancer_etat_suivant(GtkWidget *widget, gpointer data) {
     if (next_abrs != NULL && next_abrs->len > 0) {
-        // Sauvegardez l'état actuel dans le tableau des états précédents
+        // Sauvegarder l'état actuel dans le tableau des états précédents
         sauvegarder_etat_precedent();
 
-        // Libérez l'arbre actuel
+        // Libérer l'arbre actuel
         supprimerArbre(abr);
-        // Restaurez l'arbre à partir de l'état suivant sauvegardé
+        // Restaurer l'arbre à partir de l'état suivant sauvegardé
         abr = g_array_index(next_abrs, T_Arbre, next_abrs->len - 1);
-        // Supprimez l'état suivant du tableau
+        // Supprimer l'état suivant du tableau
         g_array_remove_index(next_abrs, next_abrs->len - 1);
-        // Redessinez l'arbre avec l'état suivant
+        // Redessiner l'arbre avec l'état suivant
         gtk_widget_queue_draw(darea);
     }
 }
 
 static gboolean on_key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
     if ((event->state & GDK_CONTROL_MASK) && (event->keyval == GDK_KEY_z)) {
-        // Ctrl + Z pressed, trigger undo function
+        // Ctrl + Z
         retourner_etat_precedent(widget, user_data);
-        return TRUE; // Event handled
+        return TRUE;
     } else if ((event->state & GDK_CONTROL_MASK) && (event->keyval == GDK_KEY_y)) {
-        // Ctrl + Y pressed, trigger redo function
+        // Ctrl + Y
         avancer_etat_suivant(widget, user_data);
-        return TRUE; // Event handled
+        return TRUE;
     }
-    return FALSE; // Event not handled
+    return FALSE;
 }
 
 static void rechercher_un_element(GtkWidget *widget, gpointer entry) {
@@ -514,7 +513,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
     g_signal_connect(G_OBJECT(darea), "button-press-event", G_CALLBACK(on_double_click_event), NULL);
     gtk_widget_add_events(darea, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
 
-    // Créez une nouvelle boîte horizontale pour inclure le bouton de recentrage
+    // Créer une nouvelle boîte horizontale pour inclure le bouton de recentrage
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 5);
     gtk_widget_set_visible(hbox, FALSE); // Rendre la boîte horizontale invisible (marche pas)

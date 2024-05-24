@@ -2,6 +2,7 @@
 
 extern GtkWidget *text_view;
 
+// Fonction pour la mise à jour de la zone de messages
 void append_to_message_view(const gchar *message) {
     GtkTextBuffer *buffer;
     GtkTextIter iter;
