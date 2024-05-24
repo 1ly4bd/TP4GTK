@@ -32,6 +32,7 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="gtkgui.css" />
+		<Unit filename="lightgtkgui.css" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

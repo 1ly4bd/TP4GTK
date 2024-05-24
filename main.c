@@ -3,6 +3,10 @@
 #include <gtk/gtkcssprovider.h>
 #include "tp4.h"
 #include "message_utils.h"
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 
 T_Arbre abr = NULL;
 GArray *previous_abrs = NULL;
@@ -95,7 +99,7 @@ static void dessiner_arbre(cairo_t *cr, T_Arbre abr, double x, double y, double 
         double text_center_y = y + 125;
 
         // Afficher le message
-        cairo_set_source_rgba(cr, 0.2, 0.2, 0.2, 0.5); // Couleur du texte
+        cairo_set_source_rgba(cr, 1, 1, 1, 0.25); // Couleur du texte
         cairo_move_to(cr, text_center_x, text_center_y);
         cairo_show_text(cr, message);
         return;
@@ -108,7 +112,7 @@ static void dessiner_arbre(cairo_t *cr, T_Arbre abr, double x, double y, double 
     // Dessiner un cercle avec un remplissage et une bordure
     cairo_arc(cr, x, y, 20 * zoom_level, 0, 2 * G_PI);
 
-    cairo_set_source_rgb(cr, 0.2, 0.2, 0.2); // Couleur de la bordure du cercle
+    cairo_set_source_rgba(cr, 0.45, 0.45, 0.45, 1); // Couleur de la bordure du cercle
     cairo_set_line_width(cr, 3);
     cairo_stroke(cr);
 
@@ -116,6 +120,10 @@ static void dessiner_arbre(cairo_t *cr, T_Arbre abr, double x, double y, double 
     char intervalle[32];
     sprintf(intervalle, "%d - %d", abr->borneInf, abr->borneSup);
 
+    // Sélectionner la police
+    cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    // Définir la taille de la police
+    cairo_set_font_size(cr, 10.5 * zoom_level);
     cairo_text_extents_t te;
     cairo_text_extents(cr, intervalle, &te);
     double text_width = te.width;
@@ -125,12 +133,12 @@ static void dessiner_arbre(cairo_t *cr, T_Arbre abr, double x, double y, double 
 
     // Afficher le texte
     cairo_move_to(cr, text_center_x, text_center_y);
-    cairo_set_source_rgb(cr, 0.2, 0.2, 0.2); // Couleur du texte
+    cairo_set_source_rgba(cr, 1, 1, 1, 0.85); // Couleur du texte
     cairo_show_text(cr, intervalle);
 
     // Dessiner les lignes vers les fils
     if (abr->filsGauche != NULL) {
-        cairo_set_source_rgb(cr, 0.2, 0.2, 0.2); // Couleur de la ligne
+        cairo_set_source_rgba(cr, 0.45, 0.45, 0.45, 1); // Couleur de la ligne
         cairo_set_line_width(cr, 3);
         cairo_move_to(cr, x, y + 20 * zoom_level);
         cairo_line_to(cr, x - x_offset * zoom_level, y + y_offset * zoom_level - 20 * zoom_level);
@@ -139,7 +147,7 @@ static void dessiner_arbre(cairo_t *cr, T_Arbre abr, double x, double y, double 
     }
 
     if (abr->filsDroit != NULL) {
-        cairo_set_source_rgb(cr, 0.2, 0.2, 0.2); // Couleur de la ligne
+        cairo_set_source_rgba(cr, 0.45, 0.45, 0.45, 1); // Couleur de la ligne
         cairo_set_line_width(cr, 3);
         cairo_move_to(cr, x, y + 20 * zoom_level);
         cairo_line_to(cr, x + x_offset * zoom_level, y + y_offset * zoom_level - 20 * zoom_level);
@@ -165,6 +173,9 @@ static void on_draw_event(GtkWidget *widget, cairo_t *cr, gpointer data) {
 }
 
 static void on_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer data) {
+    if (abr == NULL) {
+        return;
+    }
     if (event->button == 1) {
         last_x = event->x;
         last_y = event->y;
@@ -175,6 +186,9 @@ static void on_button_press_event(GtkWidget *widget, GdkEventButton *event, gpoi
 static gboolean on_button_release_event(GtkWidget *widget, GdkEventButton *event, gpointer data) {
     if (event->button == 1) {
         dragging = FALSE;
+    }
+    if (abr == NULL) {
+        return FALSE;
     }
     return TRUE;
 }
@@ -187,27 +201,27 @@ static gboolean on_motion_notify_event(GtkWidget *widget, GdkEventMotion *event,
         last_y = event->y;
         gtk_widget_queue_draw(widget);
     }
+    if (abr == NULL) {
+        return FALSE;
+    }
     return TRUE;
 }
 
-static gboolean on_double_click_event(GtkWidget *widget, GdkEventButton *event, gpointer data) {
-    if (event->type == GDK_2BUTTON_PRESS && event->button == 1) {
-        // Récupérer les coordonnées du double clic
-        double click_x = event->x;
-        double click_y = event->y;
-
-        // Effectuer le zoom sur l'arbre à cet endroit
-        offset_x = click_x * (1 - 1.1);
-        offset_y = click_y * (1 - 1.1);
+static gboolean on_scroll_event(GtkWidget *widget, GdkEventScroll *event, gpointer data) {
+    if (event->direction == GDK_SCROLL_UP) {
+        // Zoom in
         zoom_level *= 1.1;
-
-        // Redessiner l'arbre avec le nouveau niveau de zoom
-        gtk_widget_queue_draw(widget);
-
-        return TRUE;
+    } else if (event->direction == GDK_SCROLL_DOWN) {
+        // Zoom out
+        zoom_level /= 1.1;
     }
 
-    return FALSE;
+    // Redessiner l'arbre avec le nouveau niveau de zoom et offset
+    gtk_widget_queue_draw(widget);
+    if (abr == NULL) {
+        return FALSE;
+    }
+    return TRUE;
 }
 
 // Fonction pour insérer un élément dans l'arbre
@@ -268,6 +282,14 @@ static void supprimer_un_element(GtkWidget *widget, gpointer entry) {
     gtk_widget_queue_draw(darea);
 }
 
+static void recentrer_arbre(GtkWidget *widget, gpointer data) {
+    // Réinitialiser les valeurs de décalage pour recentrer l'arbre
+    offset_x = 0;
+    offset_y = 0;
+    // Redessiner l'arbre avec le nouveau décalage et le niveau de zoom
+    gtk_widget_queue_draw(darea);
+}
+
 // Fonction pour restaurer l'état précédent de l'arbre
 static void retourner_etat_precedent(GtkWidget *widget, gpointer data) {
     if (previous_abrs != NULL && previous_abrs->len > 0) {
@@ -281,6 +303,9 @@ static void retourner_etat_precedent(GtkWidget *widget, gpointer data) {
         // Supprimer l'état restauré du tableau
         g_array_remove_index(previous_abrs, previous_abrs->len - 1);
         // Redessiner l'arbre avec l'état précédent
+        if (previous_abrs->len == 0) {
+            recentrer_arbre(darea, abr);
+        }
         gtk_widget_queue_draw(darea);
     }
 }
@@ -412,14 +437,6 @@ static void clear_message_view() {
     gtk_text_buffer_set_text(buffer, "", -1);
 }
 
-static void recentrer_arbre(GtkWidget *widget, gpointer data) {
-    // Réinitialise les valeurs de décalage pour recentrer l'arbre
-    offset_x = 0;
-    offset_y = 0;
-    // Redessine l'arbre avec le nouveau décalage
-    gtk_widget_queue_draw(darea);
-}
-
 static void reinitialiser_arbre(GtkWidget *widget, gpointer data) {
     // Effacer le contenu de la zone de texte
     clear_message_view();
@@ -427,12 +444,21 @@ static void reinitialiser_arbre(GtkWidget *widget, gpointer data) {
     // Réinitialiser l'arbre
     supprimerArbre(abr);
     abr = NULL;
+    zoom_level = 1.0;
     recentrer_arbre(darea, abr);
     gtk_widget_queue_draw(darea);
     append_to_message_view(g_strdup_printf("Arbre reinitialise.\n"));
 }
 
 static void activate(GtkApplication *app, gpointer user_data) {
+    // Masquer la fenêtre de console sur Windows
+    #ifdef _WIN32
+    HWND consoleWindow = GetConsoleWindow();
+    if (consoleWindow != NULL) {
+        ShowWindow(consoleWindow, SW_MINIMIZE); // Minimiser la fenêtre de la console
+    }
+    #endif
+
     GtkWidget *window;
     GtkWidget *vbox;
     GtkWidget *hbox;
@@ -443,6 +469,12 @@ static void activate(GtkApplication *app, gpointer user_data) {
     window = gtk_application_window_new(app);
     gtk_window_set_title(GTK_WINDOW(window), "Gestion d'Arbre Binaire");
     gtk_window_set_default_size(GTK_WINDOW(window), 1000, 800);
+
+    // Création de la barre de titre personnalisée
+    GtkWidget *titlebar = gtk_header_bar_new();
+    gtk_header_bar_set_title(GTK_HEADER_BAR(titlebar), "Gestion d'Arbre Binaire");
+    gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(titlebar), TRUE);
+    gtk_window_set_titlebar(GTK_WINDOW(window), titlebar);
 
     // Création d'une boîte verticale pour contenir les éléments
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
@@ -505,13 +537,13 @@ static void activate(GtkApplication *app, gpointer user_data) {
     darea = gtk_drawing_area_new();
     gtk_box_pack_start(GTK_BOX(vbox), darea, TRUE, TRUE, 5);
     g_signal_connect(G_OBJECT(darea), "draw", G_CALLBACK(on_draw_event), NULL);
+    g_signal_connect(G_OBJECT(darea), "scroll-event", G_CALLBACK(on_scroll_event), NULL);
     g_signal_connect(G_OBJECT(darea), "button-press-event", G_CALLBACK(on_button_press_event), NULL);
     g_signal_connect(G_OBJECT(darea), "button-release-event", G_CALLBACK(on_button_release_event), NULL);
     g_signal_connect(G_OBJECT(darea), "motion-notify-event", G_CALLBACK(on_motion_notify_event), NULL);
     // Ajouter le gestionnaire d'événements pour la molette de la souris
     // Ajouter le gestionnaire d'événements pour le double clic
-    g_signal_connect(G_OBJECT(darea), "button-press-event", G_CALLBACK(on_double_click_event), NULL);
-    gtk_widget_add_events(darea, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
+    gtk_widget_add_events(darea, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_SCROLL_MASK);
 
     // Créer une nouvelle boîte horizontale pour inclure le bouton de recentrage
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);

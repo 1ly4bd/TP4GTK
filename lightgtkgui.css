@@ -1,0 +1,67 @@
+window {
+    background-color: #f5f5f5;
+    color: #000000;
+    font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+}
+
+button {
+    background-color: #ffffff;
+    border: 2px solid #333333;
+    border-radius: 0;
+    color: #333333;
+    padding: 10px 20px;
+}
+
+button:hover {
+    background-color: #f0f0f0;
+}
+
+button:active {
+    background-color: #e0e0e0;
+}
+
+entry {
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #cccccc;
+    border-radius: 2px;
+    padding: 5px;
+    font-size: 14px;
+}
+
+entry:focus {
+    border-color: #333;
+    box-shadow: 0 0 5px rgba(204, 204, 204, 1);
+}
+
+textview {
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #cccccc;
+    border-radius: 2px;
+    padding: 5px;
+    font-size: 14px;
+}
+
+textview text {
+    background-color: transparent;
+}
+
+frame {
+    border: 1px solid #cccccc;
+    border-radius: 2px;
+    padding: 10px;
+    background-color: #ffffff;
+}
+
+frame > label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333333;
+}
+
+drawingarea {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+}
+

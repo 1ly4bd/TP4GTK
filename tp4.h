@@ -33,7 +33,6 @@ T_Arbre supprimerElement(T_Arbre abr, int element);
 unsigned int tailleMemoireIntervalles(T_Arbre abr);
 unsigned int tailleMemoireClassique(T_Arbre abr);
 void tailleMemoire(T_Arbre abr);
-
 // Nouvelle fonction pour obtenir la racine de l'arbre
 T_Arbre obtenirRacine(T_Arbre abr);
 
