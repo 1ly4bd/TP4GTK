@@ -113,6 +113,7 @@ T_Arbre supprimerElement(T_Arbre abr, int element) {
     }
     T_Sommet *elementASupprimer = rechercherElement(abr, element);
     if (elementASupprimer == NULL) {
+        append_to_message_view(g_strdup_printf("\n"));
         append_to_message_view(g_strdup_printf("Erreur: L'element %d n'existe pas dans l'arbre. Suppression impossible.\n", element));
         return abr;
     }
@@ -138,6 +139,7 @@ T_Arbre supprimerElement(T_Arbre abr, int element) {
                     nouvelleRacine = abr->filsDroit;
                 }
                 free(abr);
+                append_to_message_view(g_strdup_printf("\n"));
                 append_to_message_view(g_strdup_printf("Suppression de %d.\n", element)); // Affichage d'un message indiquant la suppression réussie
                 return nouvelleRacine;
             }

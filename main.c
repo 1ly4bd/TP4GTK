@@ -217,6 +217,7 @@ static gboolean on_double_click_event(GtkWidget *widget, GdkEventButton *event, 
 static void inserer_un_element(GtkWidget *widget, gpointer entry) {
     const char *text = gtk_entry_get_text(GTK_ENTRY(entry));
     if (strlen(text) == 0) {
+        append_to_message_view(g_strdup_printf("\n"));
         append_to_message_view(g_strdup_printf("Erreur : Veuillez entrer un entier.\n"));
         gtk_entry_set_text(GTK_ENTRY(entry), "");
         return;
@@ -224,11 +225,13 @@ static void inserer_un_element(GtkWidget *widget, gpointer entry) {
     char *endptr;
     long element = strtol(text, &endptr, 10);
     if (*endptr != '\0') {
+        append_to_message_view(g_strdup_printf("\n"));
         append_to_message_view(g_strdup_printf("Erreur : Veuillez entrer un entier valide.\n"));
         gtk_entry_set_text(GTK_ENTRY(entry), "");
         return;
     }
     if (rechercherElement(abr, element) != NULL) {
+        append_to_message_view(g_strdup_printf("\n"));
         append_to_message_view(g_strdup_printf("Erreur: L'element %ld est deja present dans l'arbre.\n", element));
         gtk_entry_set_text(GTK_ENTRY(entry), "");
         return;
@@ -246,6 +249,7 @@ static void inserer_un_element(GtkWidget *widget, gpointer entry) {
 static void supprimer_un_element(GtkWidget *widget, gpointer entry) {
     const char *text = gtk_entry_get_text(GTK_ENTRY(entry));
     if (strlen(text) == 0) {
+        append_to_message_view(g_strdup_printf("\n"));
         append_to_message_view(g_strdup_printf("Erreur : Veuillez entrer un entier.\n"));
         gtk_entry_set_text(GTK_ENTRY(entry), "");
         return;
@@ -253,6 +257,7 @@ static void supprimer_un_element(GtkWidget *widget, gpointer entry) {
     char *endptr;
     long element = strtol(text, &endptr, 10);
     if (*endptr != '\0') {
+        append_to_message_view(g_strdup_printf("\n"));
         append_to_message_view(g_strdup_printf("Erreur : Veuillez entrer un entier valide.\n"));
         gtk_entry_set_text(GTK_ENTRY(entry), "");
         return;
@@ -315,8 +320,10 @@ static void rechercher_un_element(GtkWidget *widget, gpointer entry) {
     int element = atoi(text);
     T_Sommet *resultatRecherche = rechercherElement(abr, element);
     if (resultatRecherche != NULL) {
+        append_to_message_view(g_strdup_printf("\n"));
         append_to_message_view(g_strdup_printf("Element trouve dans l'intervalle [%d; %d].\n", resultatRecherche->borneInf, resultatRecherche->borneSup));
     } else {
+        append_to_message_view(g_strdup_printf("\n"));
         append_to_message_view(g_strdup_printf("Erreur: Element non trouve.\n"));
         gtk_entry_set_text(GTK_ENTRY(entry), "");
     }
