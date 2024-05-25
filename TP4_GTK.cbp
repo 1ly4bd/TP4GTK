@@ -32,6 +32,10 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="gtkgui.css" />
+		<Unit filename="killprocess.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="killprocess.h" />
 		<Unit filename="lightgtkgui.css" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
@@ -40,6 +44,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="message_utils.h" />
+		<Unit filename="run_app.bat" />
 		<Unit filename="tp4.c">
 			<Option compilerVar="CC" />
 		</Unit>
