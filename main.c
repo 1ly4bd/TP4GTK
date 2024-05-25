@@ -224,7 +224,10 @@ static gboolean on_motion_notify_event(GtkWidget *widget, GdkEventMotion *event,
 
 static void update_zoom_level_label() {
     if (zoom_level_label != NULL) {
-        gchar *zoom_text = g_strdup_printf("Niveau de zoom : %.2f", zoom_level);
+        // Calculer le pourcentage de zoom
+        int zoom_percentage = (int)(zoom_level * 100);
+
+        gchar *zoom_text = g_strdup_printf("Zoom : %d%%", zoom_percentage);
         gtk_label_set_text(GTK_LABEL(zoom_level_label), zoom_text);
         g_free(zoom_text);
     }
@@ -611,7 +614,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_box_pack_end(GTK_BOX(hbox), reset_zoom_button, FALSE, FALSE, 5);
 
 
-    zoom_level_label = gtk_label_new("Niveau de zoom : 1.00");
+    zoom_level_label = gtk_label_new("Zoom : 100%");
     gtk_box_pack_end(GTK_BOX(hbox), zoom_level_label, FALSE, FALSE, 5);
 
     // Création du cadre pour encadrer la zone de texte et la zone de dessin
