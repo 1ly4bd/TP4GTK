@@ -615,6 +615,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
 
     zoom_level_label = gtk_label_new("Zoom : 100%");
+    gtk_widget_set_opacity(GTK_WIDGET(zoom_level_label), 0.5); // Réglez l'opacité à 50%
     gtk_box_pack_end(GTK_BOX(hbox), zoom_level_label, FALSE, FALSE, 5);
 
     // Création du cadre pour encadrer la zone de texte et la zone de dessin
