@@ -492,6 +492,7 @@ static void reinitialiser_arbre(GtkWidget *widget, gpointer data) {
     abr = NULL;
     zoom_level = 1.0;
     recentrer_arbre(darea, abr);
+    reset_zoom_level(darea, abr);
     gtk_widget_queue_draw(darea);
     append_to_message_view(g_strdup_printf("Arbre reinitialise.\n"));
 }
