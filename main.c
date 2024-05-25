@@ -531,24 +531,24 @@ static void activate(GtkApplication *app, gpointer user_data) {
     g_signal_connect(button, "clicked", G_CALLBACK(inserer_un_element), entry);
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 5);
 
-    button = gtk_button_new_with_label("Rechercher Element");
-    g_signal_connect(button, "clicked", G_CALLBACK(rechercher_un_element), entry);
-    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 5);
-
     button = gtk_button_new_with_label("Supprimer Element");
     g_signal_connect(button, "clicked", G_CALLBACK(supprimer_un_element), entry);
+    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 5);
+
+    button = gtk_button_new_with_label("Rechercher Element");
+    g_signal_connect(button, "clicked", G_CALLBACK(rechercher_un_element), entry);
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 5);
 
     // Création d'une nouvelle boîte horizontale pour les boutons suivants
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 5);
 
-    button = gtk_button_new_with_label("Afficher Sommets");
-    g_signal_connect(button, "clicked", G_CALLBACK(afficher_sommets), NULL);
-    gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 5);
-
     button = gtk_button_new_with_label("Afficher Elements");
     g_signal_connect(button, "clicked", G_CALLBACK(afficher_elements), NULL);
+    gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 5);
+
+    button = gtk_button_new_with_label("Afficher Sommets");
+    g_signal_connect(button, "clicked", G_CALLBACK(afficher_sommets), NULL);
     gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 5);
 
     button = gtk_button_new_with_label("Afficher Taille Memoire");
