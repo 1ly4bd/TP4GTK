@@ -26,7 +26,7 @@ GArray *next_abrs = NULL;
 GtkWidget *text_view = NULL;
 GArray *noeudsGraphiques = NULL;
 static GtkWidget *darea = NULL;
-// Déclaration des variables globales pour le zoom (qui ne marche pas pour l'instant) et le panoramique
+// Déclaration des variables globales pour le zoom et le panoramique
 static double zoom_level = 1.0;
 static double offset_x = 0;
 static double offset_y = 0;
@@ -462,6 +462,18 @@ static void afficher_niveau(GtkWidget *widget, gpointer entry) {
     gtk_entry_set_text(GTK_ENTRY(entry), "");
 }
 
+static void afficher_hauteur(GtkWidget *widget, gpointer entry) {
+    int hauteur = rechercherHauteur(abr);
+    if (hauteur > 0) {
+        append_to_message_view(g_strdup_printf("\n"));
+        append_to_message_view(g_strdup_printf("Hauteur de l'arbre : %d.\n", hauteur));
+    } else {
+        append_to_message_view(g_strdup_printf("\n"));
+        append_to_message_view(g_strdup_printf("Erreur: Arbre vide.\n"));
+    }
+    gtk_entry_set_text(GTK_ENTRY(entry), "");
+}
+
 static void clear_message_view() {
     GtkTextBuffer *buffer;
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
@@ -554,6 +566,11 @@ static void activate(GtkApplication *app, gpointer user_data) {
     button = gtk_button_new_with_label("Afficher Niveau");
     g_signal_connect(button, "clicked", G_CALLBACK(afficher_niveau), entry);
     gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 5);
+
+    button = gtk_button_new_with_label("Afficher Hauteur");
+    g_signal_connect(button, "clicked", G_CALLBACK(afficher_hauteur), entry);
+    gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 5);
+
 
     button = gtk_button_new_with_label("Reinitialiser Arbre");
     g_signal_connect(button, "clicked", G_CALLBACK(reinitialiser_arbre), NULL);

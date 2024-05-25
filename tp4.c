@@ -84,7 +84,16 @@ int niveauDuSommet(T_Arbre racine, T_Sommet *sommet) {
     return niveau;
 }
 
+int rechercherHauteur(T_Arbre abr) {
+    if (abr == NULL) {
+        return 0;
+    }
 
+    int hauteurGauche = rechercherHauteur(abr->filsGauche);
+    int hauteurDroit = rechercherHauteur(abr->filsDroit);
+
+    return 1 + max(hauteurGauche, hauteurDroit); // Ajoutez 1 pour inclure le nœud actuel
+}
 
 
 void afficherSommets(T_Arbre abr) {

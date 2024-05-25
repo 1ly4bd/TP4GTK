@@ -27,6 +27,7 @@ T_Arbre insererElement(T_Arbre abr, int element);
 T_Sommet *rechercherElement(T_Arbre abr, int element);
 T_Sommet* rechercherPere(T_Arbre abr, int element);
 int niveauDuSommet(T_Arbre racine, T_Sommet *sommet);
+int rechercherHauteur(T_Arbre abr);
 void afficherSommets(T_Arbre abr);
 void afficherElements(T_Arbre abr);
 T_Arbre supprimerElement(T_Arbre abr, int element);
