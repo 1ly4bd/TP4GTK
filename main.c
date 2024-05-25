@@ -497,6 +497,19 @@ static void reinitialiser_arbre(GtkWidget *widget, gpointer data) {
     append_to_message_view(g_strdup_printf("Arbre reinitialise.\n"));
 }
 
+void cleanup() {
+    // Libérer la mémoire allouée dynamiquement
+    if (previous_abrs != NULL) {
+        g_array_free(previous_abrs, TRUE);
+    }
+    if (next_abrs != NULL) {
+        g_array_free(next_abrs, TRUE);
+    }
+    if (abr != NULL) {
+        supprimerArbre(abr);
+    }
+}
+
 static void activate(GtkApplication *app, gpointer user_data) {
     GtkWidget *window;
     GtkWidget *vbox;
@@ -686,6 +699,8 @@ int main(int argc, char **argv) {
     status = g_application_run(G_APPLICATION(app), argc, argv);
     g_object_unref(app);
 
+    // Appel de la fonction de nettoyage avant de quitter le programme
+    cleanup();
 
     return status;
 }
