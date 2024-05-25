@@ -1,31 +1,34 @@
-Gestion d'Arbre Binaire avec GTK
+Gestion d'Arbre Binaire avec GTK3
 
 - Introduction
-Cette application implémente une interface graphique en utilisant GTK pour la gestion d'un Arbre Binaire. L'arbre binaire est utilisé pour stocker des intervalles d'entiers.
+Cette application implémente une interface graphique en utilisant GTK3 pour la gestion d'un Arbre Binaire. 
+L'arbre binaire est utilisé pour stocker des intervalles d'entiers.
 
 - Fonctionnalités
-Insertion d'éléments: Permet d'insérer un nouvel élément dans l'arbre.
-Recherche d'éléments: Recherche un élément spécifique dans l'arbre.
-Suppression d'éléments: Supprime un élément spécifique de l'arbre.
-Affichage des sommets: Affiche les sommets de l'arbre.
-Affichage des éléments: Affiche tous les éléments de l'arbre.
-Affichage de la taille mémoire: Affiche la taille mémoire occupée par l'arbre.
-Affichage de la racine: Affiche la racine de l'arbre.
-Affichage du père d'un élément: Affiche le père d'un élément spécifique.
-Affichage du niveau d'un élément: Affiche le niveau d'un élément spécifique.
-Réinitialisation de l'arbre: Vide l'arbre de tous ses éléments.
-Recentrage de l'arbre: Recentre l'affichage de l'arbre.
-Reset du niveau de zoom: Réinitialise le niveau du zoom à 1.
-Fonctionnalités avancées: Possibilité de revenir en arrière (Ctrl + Z) et d'avancer (Ctrl + Y) dans l'historique des actions.
+Insertion d'éléments.
+Recherche d'éléments.
+Suppression d'éléments.
+Affichage des sommets.
+Affichage des éléments.
+Affichage de la taille mémoire occupée par l'arbre.
+Affichage de la racine.
+Affichage du père d'un élément.
+Affichage du niveau d'un élément.
+Affichage de la hauteur de l'arbre.
+Réinitialisation de l'arbre.
+Recentrage de l'arbre.
+Reset du niveau de zoom.
+Possibilité de revenir en arrière (Ctrl + Z) et d'avancer (Ctrl + Y) dans l'historique des actions.
 
 - Installation et Utilisation
 	- En utilisant les fichiers C:
-Assurez-vous d'avoir les dépendances GTK installées sur votre système.
+Disponibles dans le dossier "Fichiers C".
+Assurez-vous d'avoir les dépendances GTK3 installées sur votre système.
 Clonez ce dépôt ou téléchargez le code source.
 Compilez le code source à l'aide du compilateur C de votre choix.
 Exécutez l'application compilée.
-	- En utilisant le logiciel exécutable:
-...
+	- En utilisant directement l'application exécutable:
+L'application est installable dans le dossier "Application", éxécuter TP5TreeSetup et suivre les étapes. 
 
 - Utilisation de l'interface
 Saisissez les éléments dans la zone de saisie.

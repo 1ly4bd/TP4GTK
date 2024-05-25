@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1716646736 source:c:\users\abdul\desktop\utc\tc04\nf16\tp4_gtk\main.c
+1716647751 source:c:\users\abdul\desktop\utc\tc04\nf16\tp4_gtk\main.c
 	<gtk/gtk.h>
 	<cairo.h>
 	<gtk/gtkcssprovider.h>
