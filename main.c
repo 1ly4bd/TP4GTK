@@ -7,17 +7,6 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
-#ifdef __APPLE__
-    // Masquer la fenêtre de console sur Mac
-    #include <CoreFoundation/CoreFoundation.h>
-    #include <Carbon/Carbon.h>
-
-    void hideConsoleWindow() {
-        ProcessSerialNumber psn = {0, kCurrentProcess};
-        TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-        SetFrontProcess(&psn);
-    }
-#endif
 
 
 T_Arbre abr = NULL;
@@ -36,6 +25,11 @@ static gboolean dragging = FALSE;
 static GtkWidget *scrolled_window = NULL;
 static GtkWidget *zoom_level_label = NULL;
 static GtkWidget *reset_zoom_button = NULL;
+GtkWidget *window;
+GtkWidget *vbox;
+GtkWidget *hbox;
+GtkWidget *button;
+GtkWidget *entry;
 
 
 typedef struct {
@@ -510,13 +504,91 @@ void cleanup() {
     }
 }
 
-static void activate(GtkApplication *app, gpointer user_data) {
-    GtkWidget *window;
-    GtkWidget *vbox;
-    GtkWidget *hbox;
-    GtkWidget *button;
-    GtkWidget *entry;
+// Déclaration de la fenêtre pour l'écran de démarrage
+GtkWidget *splash_window = NULL;
 
+// Fonction pour masquer ou fermer l'écran de démarrage
+static void hide_splash_screen() {
+    if (splash_window != NULL) {
+        gtk_widget_destroy(splash_window);
+        splash_window = NULL;
+    }
+}
+
+// Fonction de rappel pour afficher la fenêtre principale après un délai
+static gboolean show_main_window(gpointer user_data) {
+    // Masquer l'écran de démarrage
+    hide_splash_screen();
+
+    // Affichage de la fenêtre principale
+    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+    gtk_widget_show_all(window);
+
+    return G_SOURCE_REMOVE; // Supprimer la source de l'événement
+}
+
+// Fonction pour créer et afficher l'écran de démarrage
+static void show_splash_screen() {
+    // Création de la fenêtre
+    splash_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_decorated(GTK_WINDOW(splash_window), FALSE); // Supprimer la décoration de la fenêtre
+    gtk_window_set_position(GTK_WINDOW(splash_window), GTK_WIN_POS_CENTER); // Centrer la fenêtre
+    gtk_window_set_default_size(GTK_WINDOW(splash_window), 1000, 500);
+    gtk_widget_set_name(splash_window, "splash_window");
+
+    // Création de la boîte verticale pour le contenu de l'écran de démarrage
+    GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_add(GTK_CONTAINER(splash_window), vbox);
+
+    // Espacement pour centrer la hbox verticalement
+    GtkWidget *vbox_spacing_top = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_set_size_request(vbox_spacing_top, -1, 150); // Ajustez la hauteur pour centrer verticalement
+    gtk_box_pack_start(GTK_BOX(vbox), vbox_spacing_top, FALSE, FALSE, 0);
+
+    // Création de la boîte horizontale pour l'icône et le label
+    GtkWidget *hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10); // Espacement de 10 pixels entre les éléments
+    gtk_box_set_homogeneous(GTK_BOX(hbox), FALSE);
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
+
+    // Chargement de l'image PNG et redimensionnement
+    GtkWidget *image = gtk_image_new_from_file("C:\\Users\\Abdul\\Desktop\\UTC\\TC04\\NF16\\TP4_GTK\\icone.png");
+    GdkPixbuf *pixbuf = gtk_image_get_pixbuf(GTK_IMAGE(image));
+    GdkPixbuf *scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf, gdk_pixbuf_get_width(pixbuf) / 2, gdk_pixbuf_get_height(pixbuf) / 2, GDK_INTERP_BILINEAR);
+    gtk_image_set_from_pixbuf(GTK_IMAGE(image), scaled_pixbuf);
+    gtk_widget_set_name(image, "splash_image");
+
+    // Création d'une boîte de remplissage pour centrer l'image et le label horizontalement
+    GtkWidget *hbox_filler_left = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), hbox_filler_left, TRUE, TRUE, 0);
+
+    // Ajout de l'image à la boîte horizontale
+    gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
+
+    // Ajout du label "Chargement en cours..." et agrandissement de la taille de la police
+    GtkWidget *label = gtk_label_new("Chargement en cours...");
+    PangoFontDescription *font_desc = pango_font_description_from_string("Segoe UI 24"); // Agrandir la taille de la police
+    gtk_widget_override_font(label, font_desc);
+    pango_font_description_free(font_desc);
+    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+    gtk_widget_set_name(label, "splash_label");
+
+    // Création d'une boîte de remplissage pour centrer l'image et le label horizontalement
+    GtkWidget *hbox_filler_right = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), hbox_filler_right, TRUE, TRUE, 0);
+
+    // Espacement pour centrer la hbox verticalement
+    GtkWidget *vbox_spacing_bottom = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_set_size_request(vbox_spacing_bottom, -1, 150); // Ajustez la hauteur pour centrer verticalement
+    gtk_box_pack_start(GTK_BOX(vbox), vbox_spacing_bottom, FALSE, FALSE, 0);
+
+    // Affichage de la fenêtre
+    gtk_widget_show_all(splash_window);
+
+    // Temporisation pour fermer l'écran de démarrage après quelques secondes (par exemple, 3 secondes)
+    g_timeout_add(3000, show_main_window, NULL);
+}
+
+static void activate(GtkApplication *app, gpointer user_data) {
     // Initialisation de la fenêtre principale
     window = gtk_application_window_new(app);
     gtk_window_set_title(GTK_WINDOW(window), "Gestion d'Arbre Binaire");
@@ -670,26 +742,19 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
     gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
+    // Afficher l'écran de démarrage
+    show_splash_screen();
+}
 
-    // Affichage de la fenêtre principale
-    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
-    gtk_widget_show_all(window);
-
+int main(int argc, char **argv) {
     // Masquer la fenêtre de console sur Windows
     #ifdef _WIN32
     HWND consoleWindow = GetConsoleWindow();
     if (consoleWindow != NULL) {
-        ShowWindow(consoleWindow, SW_MINIMIZE); // Minimiser la fenêtre de la console
+        ShowWindow(consoleWindow, SW_SHOWMINIMIZED); // Minimiser la fenêtre de la console
     }
     #endif
 
-    // Masquer la fenêtre de console sur Mac
-    #ifdef __APPLE__
-    hideConsoleWindow();
-    #endif
-}
-
-int main(int argc, char **argv) {
     GtkApplication *app;
     int status;
 
