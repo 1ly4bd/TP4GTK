@@ -34,5 +34,6 @@ T_Arbre supprimerElement(T_Arbre abr, int element);
 unsigned int tailleMemoireIntervalles(T_Arbre abr);
 unsigned int tailleMemoireClassique(T_Arbre abr);
 void tailleMemoire(T_Arbre abr);
+T_Arbre fusionnerSommets(T_Arbre abr);
 
 #endif /* TP4_H */

@@ -31,7 +31,7 @@ T_Arbre insererElement(T_Arbre abr, int element) {
     } else if (element > abr->borneSup + 1) {
         abr->filsDroit = insererElement(abr->filsDroit, element);
     }
-    return abr;
+    return fusionnerSommets(abr);
 }
 
 T_Sommet *rechercherElement(T_Arbre abr, int element) {
@@ -149,7 +149,7 @@ T_Arbre supprimerElement(T_Arbre abr, int element) {
                 free(abr);
                 append_to_message_view(g_strdup_printf("\n"));
                 append_to_message_view(g_strdup_printf("Suppression de %d.\n", element)); // Affichage d'un message indiquant la suppression réussie
-                return nouvelleRacine;
+                return fusionnerSommets(nouvelleRacine);
             }
         } else {
             if (element == abr->borneInf) {
@@ -193,11 +193,11 @@ T_Arbre supprimerElement(T_Arbre abr, int element) {
                 free(abr);
 
                 // Retourner le nouveau sous-arbre avec les deux nouveaux sommets
-                return nouveauGauche;
+                return fusionnerSommets(nouveauGauche);
             }
         }
     }
-    return abr;
+    return fusionnerSommets(abr);
 }
 
 
@@ -232,5 +232,43 @@ void tailleMemoire(T_Arbre abr) {
     append_to_message_view(g_strdup_printf("Memoire d'un sommet intervalle: %u octets.\n", tailleSommetIntervalles));
     append_to_message_view(g_strdup_printf("Memoire d'un sommet normal: %u octets. ", tailleSommetClassique));
 }
+
+T_Arbre fusionnerSommets(T_Arbre abr) {
+    if (abr == NULL) {
+        return NULL;
+    }
+
+    // Fusionner les sous-arbres gauche et droit
+    abr->filsGauche = fusionnerSommets(abr->filsGauche);
+    abr->filsDroit = fusionnerSommets(abr->filsDroit);
+
+    // Fusionner les sommets consécutifs à gauche
+    if (abr->filsGauche != NULL && abr->filsGauche->borneSup + 1 >= abr->borneInf) {
+        // Mettre à jour la borneInf du sommet actuel
+        abr->borneInf = abr->filsGauche->borneInf;
+
+        // Supprimer le sommet fusionné
+        T_Sommet *temp = abr->filsGauche;
+        abr->filsGauche = abr->filsGauche->filsGauche;
+        free(temp);
+    }
+
+    // Fusionner les sommets consécutifs à droite
+    if (abr->filsDroit != NULL && abr->filsDroit->borneInf <= abr->borneSup + 1) {
+        // Mettre à jour la borneSup du sommet actuel
+        abr->borneSup = abr->filsDroit->borneSup;
+
+        // Supprimer le sommet fusionné
+        T_Sommet *temp = abr->filsDroit;
+        abr->filsDroit = abr->filsDroit->filsDroit;
+        free(temp);
+    }
+
+    return abr;
+}
+
+
+
+
 
 

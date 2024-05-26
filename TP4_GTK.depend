@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1716739845 source:c:\users\abdul\desktop\utc\tc04\nf16\tp4_gtk\main.c
+1716750967 source:c:\users\abdul\desktop\utc\tc04\nf16\tp4_gtk\main.c
 	<gtk/gtk.h>
 	<cairo.h>
 	<gtk/gtkcssprovider.h>
@@ -8,7 +8,7 @@
 	"killprocess.h"
 	<windows.h>
 
-1716646050 c:\users\abdul\desktop\utc\tc04\nf16\tp4_gtk\tp4.h
+1716750512 c:\users\abdul\desktop\utc\tc04\nf16\tp4_gtk\tp4.h
 
 1715939285 c:\msys64\mingw64\include\stdio.h
 	<corecrt_stdio_config.h>
@@ -114,7 +114,7 @@
 
 1715939805 c:\msys64\mingw64\include\pthread_unistd.h
 
-1716646586 source:c:\users\abdul\desktop\utc\tc04\nf16\tp4_gtk\tp4.c
+1716750739 source:c:\users\abdul\desktop\utc\tc04\nf16\tp4_gtk\tp4.c
 	"tp4.h"
 	"message_utils.h"
 	<stdio.h>
