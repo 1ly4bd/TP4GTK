@@ -551,7 +551,7 @@ static void show_splash_screen() {
     gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
 
     // Chargement de l'image PNG et redimensionnement
-    GtkWidget *image = gtk_image_new_from_file("C:\\Users\\Abdul\\Desktop\\UTC\\TC04\\NF16\\TP4_GTK\\icone.png");
+    GtkWidget *image = gtk_image_new_from_file("icone.png");
     GdkPixbuf *pixbuf = gtk_image_get_pixbuf(GTK_IMAGE(image));
     GdkPixbuf *scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf, gdk_pixbuf_get_width(pixbuf) / 2, gdk_pixbuf_get_height(pixbuf) / 2, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(GTK_IMAGE(image), scaled_pixbuf);
