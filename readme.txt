@@ -28,7 +28,7 @@ Clonez ce dépôt ou téléchargez le code source.
 Compilez le code source à l'aide du compilateur C de votre choix.
 Exécutez l'application compilée.
 	- En utilisant directement l'application exécutable:
-L'application est installable dans le dossier "Application", éxécuter TP5TreeSetup et suivre les étapes. 
+L'application est installable dans le dossier "Application", éxécuter TP4TreeSetup et suivre les étapes. 
 
 - Utilisation de l'interface
 Saisissez les éléments dans la zone de saisie.
