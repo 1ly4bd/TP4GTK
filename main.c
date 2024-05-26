@@ -599,6 +599,9 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_header_bar_set_title(GTK_HEADER_BAR(titlebar), "Gestion d'Arbre Binaire");
     gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(titlebar), TRUE);
     gtk_window_set_titlebar(GTK_WINDOW(window), titlebar);
+    #ifdef _WIN32
+    g_signal_connect(window, "destroy", G_CALLBACK(killProcess), NULL);
+    #endif
 
     // Création d'une boîte verticale pour contenir les éléments
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
