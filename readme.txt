@@ -31,8 +31,8 @@ Exécutez l'application compilée.
 L'application est installable dans le dossier "Application", éxécuter TP4TreeSetup et suivre les étapes. 
 
 - Note de Sécurité
-Le téléchargement et l'exécution de fichiers exécutables (.exe) comportent des risques potentiels, même s'ils proviennent de sources fiables. 
-Il est fortement recommandé d'utiliser un logiciel antivirus pour analyser les fichiers avant de les exécuter. 
+Le téléchargement et l'exécution de fichiers exécutables (.exe) comportent des risques potentiels. Il est conseillé d'analyser les fichiers avant de les exécuter. 
+Testé avec VirusTotal, seulement 2 AV détectent un virus mais c'est juste un faux positif. L'appli n'est pas connue et non signée donc c'est normal. 
 
 - Utilisation de l'interface
 Saisissez les éléments dans la zone de saisie.
