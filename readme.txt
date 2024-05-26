@@ -30,6 +30,10 @@ Exécutez l'application compilée.
 	- En utilisant directement l'application exécutable:
 L'application est installable dans le dossier "Application", éxécuter TP4TreeSetup et suivre les étapes. 
 
+- Note de Sécurité
+Le téléchargement et l'exécution de fichiers exécutables (.exe) comportent des risques potentiels, même s'ils proviennent de sources fiables. 
+Il est fortement recommandé d'utiliser un logiciel antivirus pour analyser les fichiers avant de les exécuter. 
+
 - Utilisation de l'interface
 Saisissez les éléments dans la zone de saisie.
 Cliquez sur les boutons correspondants aux actions que vous souhaitez effectuer.
@@ -39,7 +43,3 @@ Utilisez la souris ou le pad pour déplacer et zoomer sur l'arbre.
 - Auteurs
 OGUNLEYE ABDULQUDUS
 MILLOT MATHIS
-
-
-
-
