@@ -15,6 +15,7 @@ Affichage de la racine.
 Affichage du père d'un élément.
 Affichage du niveau d'un élément.
 Affichage de la hauteur de l'arbre.
+Equilibrer l'arbre.
 Réinitialisation de l'arbre.
 Recentrage de l'arbre.
 Reset du niveau de zoom.
