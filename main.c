@@ -126,14 +126,14 @@ static void dessiner_arbre(cairo_t *cr, T_Arbre abr, double x, double y, double 
     NoeudGraphique noeud = { x, y, abr };
     g_array_append_val(noeudsGraphiques, noeud);
 
-    // Dessiner un cercle avec un remplissage et une bordure
+    // Dessiner un cercle
     cairo_arc(cr, x, y, 20 * zoom_level, 0, 2 * G_PI);
 
     cairo_set_source_rgba(cr, 0.45, 0.45, 0.45, 1); // Couleur de la bordure du cercle
     cairo_set_line_width(cr, 3);
     cairo_stroke(cr);
 
-    // Préparer le texte à afficher
+    // Préparer le texte à afficher dans les cercles
     char intervalle[32];
     sprintf(intervalle, "%d - %d", abr->borneInf, abr->borneSup);
 
@@ -212,7 +212,7 @@ static void on_button_press_event(GtkWidget *widget, GdkEventButton *event, gpoi
         // Enregistrer les coordonnées du dernier clic
         last_x = event->x;
         last_y = event->y;
-        dragging = TRUE;
+        dragging = TRUE; // Décalage activé
     }
 }
 
@@ -221,7 +221,7 @@ static void on_button_press_event(GtkWidget *widget, GdkEventButton *event, gpoi
 static gboolean on_button_release_event(GtkWidget *widget, GdkEventButton *event, gpointer data) {
     // Vérifier si le bouton relâché est le bouton gauche de la souris
     if (event->button == 1) {
-        dragging = FALSE;
+        dragging = FALSE; // Décalage désactivé
     }
     // Vérifier si l'arbre est vide
     if (abr == NULL) {
@@ -729,12 +729,12 @@ static void activate(GtkApplication *app, gpointer user_data) {
     // Ajouter le gestionnaire d'�v�nements pour le double clic
     gtk_widget_add_events(darea, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_SCROLL_MASK);
 
-    // Cr�er une nouvelle bo�te horizontale pour inclure le bouton de recentrage
+    // Cr�er une nouvelle bo�te horizontale
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 5);
     gtk_widget_set_visible(hbox, FALSE); // Rendre la bo�te horizontale invisible (marche pas)
 
-    // Cr�ation du bouton de recentrage
+    // Cr�ation des boutons de recentrage, retour, avancement et zoom
     button = gtk_button_new_with_label("Avancer");
     g_signal_connect(button, "clicked", G_CALLBACK(avancer_etat_suivant), NULL);
     gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 5);
@@ -753,7 +753,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
 
     zoom_level_label = gtk_label_new("Zoom : 100%");
-    gtk_widget_set_opacity(GTK_WIDGET(zoom_level_label), 0.5); // R�glez l'opacit� � 50%
+    gtk_widget_set_opacity(GTK_WIDGET(zoom_level_label), 0.5); // R�gler l'opacit� � 50%
     gtk_box_pack_end(GTK_BOX(hbox), zoom_level_label, FALSE, FALSE, 5);
 
     // Cr�ation du cadre pour encadrer la zone de texte et la zone de dessin
@@ -794,7 +794,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
     gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-    // Afficher l'�cran de d�marrage
+    // Afficher l'�cran de d�marrage qui va ensuite afficher la fenetre principale
     show_splash_screen();
 }
 
