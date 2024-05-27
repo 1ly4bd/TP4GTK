@@ -9,13 +9,15 @@
 #endif
 
 
+// DÃ©claration des variables globales pour l'arbre, les Ã©tats prÃ©cÃ©dents et suivants, la zone de texte, les nÅ“uds graphiques et la zone de dessin
 T_Arbre abr = NULL;
 GArray *previous_abrs = NULL;
 GArray *next_abrs = NULL;
 GtkWidget *text_view = NULL;
 GArray *noeudsGraphiques = NULL;
 static GtkWidget *darea = NULL;
-// Déclaration des variables globales pour le zoom et le panoramique
+
+// DÃ©claration des variables globales pour le zoom et le panoramique
 static double zoom_level = 1.0;
 static double offset_x = 0;
 static double offset_y = 0;
@@ -25,32 +27,35 @@ static gboolean dragging = FALSE;
 static GtkWidget *scrolled_window = NULL;
 static GtkWidget *zoom_level_label = NULL;
 static GtkWidget *reset_zoom_button = NULL;
+
+// DÃ©claration des widgets de la fenÃªtre principale
 GtkWidget *window;
 GtkWidget *vbox;
 GtkWidget *hbox;
 GtkWidget *button;
 GtkWidget *entry;
 
-
+// Structure pour reprÃ©senter un nÅ“ud graphique
 typedef struct {
     double x;
     double y;
     T_Sommet *sommet;
 } NoeudGraphique;
 
+// Fonction pour copier un arbre
 T_Arbre copierArbre(T_Arbre abr) {
     if (abr == NULL) {
         return NULL;
     }
 
-    // Créez un nouveau sommet pour l'arbre copié
+    // CrÃ©er un nouveau sommet pour l'arbre copiÃ©
     T_Arbre copie = (T_Arbre)malloc(sizeof(struct T_Sommet));
     if (copie == NULL) {
-        append_to_message_view(g_strdup_printf("Erreur lors de l'allocation de mémoire pour la copie de l'arbre.\n"));
+        append_to_message_view(g_strdup_printf("Erreur lors de l'allocation de mÃ©moire pour la copie de l'arbre.\n"));
         exit(EXIT_FAILURE);
     }
 
-    // Copier les données du sommet
+    // Copier les donnÃ©es du sommet
     copie->borneInf = abr->borneInf;
     copie->borneSup = abr->borneSup;
 
@@ -61,6 +66,7 @@ T_Arbre copierArbre(T_Arbre abr) {
     return copie;
 }
 
+// Fonction pour supprimer un arbre
 void supprimerArbre(T_Arbre abr) {
     if (abr == NULL) {
         return;
@@ -71,31 +77,33 @@ void supprimerArbre(T_Arbre abr) {
     free(abr);
 }
 
-// Fonction pour sauvegarder l'état actuel de l'arbre
+// Fonction pour sauvegarder l'Ã©tat prÃ©cÃ©dent de l'arbre
 void sauvegarder_etat_precedent() {
-    // Créer un tableau dynamique s'il n'existe pas encore
+    // CrÃ©er un tableau dynamique s'il n'existe pas encore
     if (previous_abrs == NULL) {
         previous_abrs = g_array_new(FALSE, FALSE, sizeof(T_Arbre));
     }
-    // Faire une copie de l'arbre actuel et ajoutez-la au tableau
+    // Faire une copie de l'arbre actuel et l'ajouter au tableau
     T_Arbre copie = copierArbre(abr);
     g_array_append_val(previous_abrs, copie);
 }
 
+// Fonction pour sauvegarder l'Ã©tat suivant de l'arbre
 void sauvegarder_etat_suivant() {
-    // Créer un tableau dynamique s'il n'existe pas encore
+    // CrÃ©er un tableau dynamique s'il n'existe pas encore
     if (next_abrs == NULL) {
         next_abrs = g_array_new(FALSE, FALSE, sizeof(T_Arbre));
     }
-    // Faire une copie de l'arbre actuel et ajoutez-la au tableau
+    // Faire une copie de l'arbre actuel et l'ajouter au tableau
     T_Arbre copie = copierArbre(abr);
     g_array_append_val(next_abrs, copie);
 }
 
+// Fonction pour dessiner l'arbre
 static void dessiner_arbre(cairo_t *cr, T_Arbre abr, double x, double y, double x_offset, double y_offset) {
-    // Vérifier si l'arbre est vide
+    // VÃ©rifier si l'arbre est vide
     if (abr == NULL) {
-        // Définir le texte et sa taille
+        // DÃ©finir le texte et sa taille
         char *message = "Arbre vide";
         double font_size = 16;
 
@@ -114,7 +122,7 @@ static void dessiner_arbre(cairo_t *cr, T_Arbre abr, double x, double y, double 
         return;
     }
 
-    // Enregistrer les coordonnées et le sommet associé
+    // Enregistrer les coordonnÃ©es et le sommet associÃ©
     NoeudGraphique noeud = { x, y, abr };
     g_array_append_val(noeudsGraphiques, noeud);
 
@@ -125,13 +133,13 @@ static void dessiner_arbre(cairo_t *cr, T_Arbre abr, double x, double y, double 
     cairo_set_line_width(cr, 3);
     cairo_stroke(cr);
 
-    // Préparer le texte à afficher
+    // PrÃ©parer le texte Ã  afficher
     char intervalle[32];
     sprintf(intervalle, "%d - %d", abr->borneInf, abr->borneSup);
 
-    // Sélectionner la police
+    // SÃ©lectionner la police
     cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    // Définir la taille de la police
+    // DÃ©finir la taille de la police
     cairo_set_font_size(cr, 10.5 * zoom_level);
     cairo_text_extents_t te;
     cairo_text_extents(cr, intervalle, &te);
@@ -146,112 +154,147 @@ static void dessiner_arbre(cairo_t *cr, T_Arbre abr, double x, double y, double 
     cairo_show_text(cr, intervalle);
 
     // Dessiner les lignes vers les fils
+    // Dessiner la ligne vers le fils gauche
     if (abr->filsGauche != NULL) {
         cairo_set_source_rgba(cr, 0.45, 0.45, 0.45, 1); // Couleur de la ligne
         cairo_set_line_width(cr, 3);
         cairo_move_to(cr, x, y + 20 * zoom_level);
         cairo_line_to(cr, x - x_offset * zoom_level, y + y_offset * zoom_level - 20 * zoom_level);
         cairo_stroke(cr);
+        // Appeler rÃ©cursivement la fonction pour dessiner l'arbre du fils gauche
         dessiner_arbre(cr, abr->filsGauche, x - x_offset * zoom_level, y + y_offset * zoom_level, x_offset / 1.5, y_offset);
     }
 
+    // Dessiner la ligne vers le fils droit
     if (abr->filsDroit != NULL) {
         cairo_set_source_rgba(cr, 0.45, 0.45, 0.45, 1); // Couleur de la ligne
         cairo_set_line_width(cr, 3);
         cairo_move_to(cr, x, y + 20 * zoom_level);
         cairo_line_to(cr, x + x_offset * zoom_level, y + y_offset * zoom_level - 20 * zoom_level);
         cairo_stroke(cr);
+        // Appeler rÃ©cursivement la fonction pour dessiner l'arbre du fils droit
         dessiner_arbre(cr, abr->filsDroit, x + x_offset * zoom_level, y + y_offset * zoom_level, x_offset / 1.5, y_offset);
     }
 }
 
+// Fonction de gestion de l'Ã©vÃ©nement de dessin
+// Cette fonction est appelÃ©e lorsqu'il est nÃ©cessaire de dessiner le contenu de la zone de dessin
 static void on_draw_event(GtkWidget *widget, cairo_t *cr, gpointer data) {
+    // CrÃ©er un tableau pour stocker les nÅ“uds graphiques
     noeudsGraphiques = g_array_new(FALSE, FALSE, sizeof(NoeudGraphique));
 
+    // Obtenir les dimensions de la zone de dessin
     GtkAllocation allocation;
     gtk_widget_get_allocation(widget, &allocation);
     int width = allocation.width;
     int height = allocation.height;
 
+    // Calculer les coordonnÃ©es de dÃ©part pour dessiner l'arbre
     double start_x = width / 2.0 + offset_x;
     double start_y = height / 4.0 + offset_y;
 
+    // Dessiner l'arbre en utilisant la fonction dessiner_arbre
     dessiner_arbre(cr, abr, start_x, start_y, (width / 2.0) / 2.0, (height / 4.0) / 2.0);
 
+    // LibÃ©rer le tableau des nÅ“uds graphiques
     g_array_free(noeudsGraphiques, TRUE);
 }
 
+// Fonction de gestion de l'Ã©vÃ©nement de pression sur le bouton de la souris
+// Cette fonction est appelÃ©e lorsqu'un bouton de la souris est pressÃ©
 static void on_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer data) {
+    // VÃ©rifier si l'arbre est vide
     if (abr == NULL) {
         return;
     }
+    // VÃ©rifier si le bouton pressÃ© est le bouton gauche de la souris
     if (event->button == 1) {
+        // Enregistrer les coordonnÃ©es du dernier clic
         last_x = event->x;
         last_y = event->y;
         dragging = TRUE;
     }
 }
 
+// Fonction de gestion de l'Ã©vÃ©nement de relÃ¢chement du bouton de la souris
+// Cette fonction est appelÃ©e lorsqu'un bouton de la souris est relÃ¢chÃ©
 static gboolean on_button_release_event(GtkWidget *widget, GdkEventButton *event, gpointer data) {
+    // VÃ©rifier si le bouton relÃ¢chÃ© est le bouton gauche de la souris
     if (event->button == 1) {
         dragging = FALSE;
     }
+    // VÃ©rifier si l'arbre est vide
     if (abr == NULL) {
         return FALSE;
     }
     return TRUE;
 }
 
+// Fonction de gestion de l'Ã©vÃ©nement de mouvement de la souris
+// Cette fonction est appelÃ©e lorsqu'il y a un mouvement de la souris
 static gboolean on_motion_notify_event(GtkWidget *widget, GdkEventMotion *event, gpointer data) {
+    // VÃ©rifier si le glissement est en cours
     if (dragging) {
+        // Mettre Ã  jour les coordonnÃ©es de dÃ©calage en fonction du mouvement de la souris
         offset_x += event->x - last_x;
         offset_y += event->y - last_y;
         last_x = event->x;
         last_y = event->y;
+        // Mettre Ã  jour l'affichage de la zone de dessin
         gtk_widget_queue_draw(widget);
     }
+    // VÃ©rifier si l'arbre est vide
     if (abr == NULL) {
         return FALSE;
     }
     return TRUE;
 }
 
+// Fonction pour mettre Ã  jour le libellÃ© du niveau de zoom
 static void update_zoom_level_label() {
     if (zoom_level_label != NULL) {
         // Calculer le pourcentage de zoom
         int zoom_percentage = (int)(zoom_level * 100);
-
+        // CrÃ©er le texte du libellÃ©
         gchar *zoom_text = g_strdup_printf("Zoom : %d%%", zoom_percentage);
+        // Mettre Ã  jour le libellÃ© du niveau de zoom
         gtk_label_set_text(GTK_LABEL(zoom_level_label), zoom_text);
         g_free(zoom_text);
     }
 }
 
+// Fonction pour rÃ©initialiser le niveau de zoom
 static void reset_zoom_level(GtkWidget *widget, gpointer data) {
     zoom_level = 1.0;
+    // Mettre Ã  jour le libellÃ© du niveau de zoom
     update_zoom_level_label();
+    // Mettre Ã  jour l'affichage de la zone de dessin
     gtk_widget_queue_draw(darea);
 }
 
+// Fonction de gestion de l'Ã©vÃ©nement de dÃ©filement de la souris
+// Cette fonction est appelÃ©e lorsqu'il y a un dÃ©filement de la souris
 static gboolean on_scroll_event(GtkWidget *widget, GdkEventScroll *event, gpointer data) {
+    // VÃ©rifier la direction du dÃ©filement
     if (event->direction == GDK_SCROLL_UP) {
-        // Zoom in
+        // Zoom avant
         zoom_level *= 1.1;
     } else if (event->direction == GDK_SCROLL_DOWN) {
-        // Zoom out
+        // Zoom arriÃ¨re
         zoom_level /= 1.1;
     }
-
-    // Redessiner l'arbre avec le nouveau niveau de zoom et offset
+    // Mettre Ã  jour l'affichage de la zone de dessin
     gtk_widget_queue_draw(widget);
+    // VÃ©rifier si l'arbre est vide
     if (abr == NULL) {
         return FALSE;
     }
+    // Mettre Ã  jour le libellÃ© du niveau de zoom
     update_zoom_level_label();
     return TRUE;
 }
 
-// Fonction pour insérer un élément dans l'arbre
+// Fonction pour insÃ©rer un Ã©lÃ©ment dans l'arbre
 static void inserer_un_element(GtkWidget *widget, gpointer entry) {
     const char *text = gtk_entry_get_text(GTK_ENTRY(entry));
     if (strlen(text) == 0) {
@@ -274,7 +317,7 @@ static void inserer_un_element(GtkWidget *widget, gpointer entry) {
         gtk_entry_set_text(GTK_ENTRY(entry), "");
         return;
     }
-    // Sauvegarder l'état actuel de l'arbre
+    // Sauvegarder l'Ã©tat actuel de l'arbre
     sauvegarder_etat_precedent();
 
     abr = insererElement(abr, (int)element);
@@ -284,7 +327,7 @@ static void inserer_un_element(GtkWidget *widget, gpointer entry) {
     gtk_widget_queue_draw(darea);
 }
 
-// Fonction pour supprimer un élément de l'arbre
+// Fonction pour supprimer un Ã©lÃ©ment de l'arbre
 static void supprimer_un_element(GtkWidget *widget, gpointer entry) {
     const char *text = gtk_entry_get_text(GTK_ENTRY(entry));
     if (strlen(text) == 0) {
@@ -301,7 +344,7 @@ static void supprimer_un_element(GtkWidget *widget, gpointer entry) {
         gtk_entry_set_text(GTK_ENTRY(entry), "");
         return;
     }
-    // Sauvegarder l'état actuel de l'arbre
+    // Sauvegarder l'Ã©tat actuel de l'arbre
     sauvegarder_etat_precedent();
 
     abr = supprimerElement(abr, (int)element);
@@ -310,26 +353,26 @@ static void supprimer_un_element(GtkWidget *widget, gpointer entry) {
 }
 
 static void recentrer_arbre(GtkWidget *widget, gpointer data) {
-    // Réinitialiser les valeurs de décalage pour recentrer l'arbre
+    // RÃ©initialiser les valeurs de dÃ©calage pour recentrer l'arbre
     offset_x = 0;
     offset_y = 0;
-    // Redessiner l'arbre avec le nouveau décalage et le niveau de zoom
+    // Redessiner l'arbre avec le nouveau dÃ©calage et le niveau de zoom
     gtk_widget_queue_draw(darea);
 }
 
-// Fonction pour restaurer l'état précédent de l'arbre
+// Fonction pour restaurer l'Ã©tat prÃ©cÃ©dent de l'arbre
 static void retourner_etat_precedent(GtkWidget *widget, gpointer data) {
     if (previous_abrs != NULL && previous_abrs->len > 0) {
-        // Sauvegarder l'état actuel dans le tableau des états suivants
+        // Sauvegarder l'ï¿½tat actuel dans le tableau des ï¿½tats suivants
         sauvegarder_etat_suivant();
 
-        // Libérer l'arbre actuel
+        // Libï¿½rer l'arbre actuel
         supprimerArbre(abr);
-        // Restaurer l'arbre à partir du dernier état sauvegardé
+        // Restaurer l'arbre ï¿½ partir du dernier ï¿½tat sauvegardï¿½
         abr = g_array_index(previous_abrs, T_Arbre, previous_abrs->len - 1);
-        // Supprimer l'état restauré du tableau
+        // Supprimer l'ï¿½tat restaurï¿½ du tableau
         g_array_remove_index(previous_abrs, previous_abrs->len - 1);
-        // Redessiner l'arbre avec l'état précédent
+        // Redessiner l'arbre avec l'ï¿½tat prï¿½cï¿½dent
         if (previous_abrs->len == 0) {
             recentrer_arbre(darea, abr);
             reset_zoom_level(darea, abr);
@@ -340,16 +383,16 @@ static void retourner_etat_precedent(GtkWidget *widget, gpointer data) {
 
 static void avancer_etat_suivant(GtkWidget *widget, gpointer data) {
     if (next_abrs != NULL && next_abrs->len > 0) {
-        // Sauvegarder l'état actuel dans le tableau des états précédents
+        // Sauvegarder l'ï¿½tat actuel dans le tableau des ï¿½tats prï¿½cï¿½dents
         sauvegarder_etat_precedent();
 
-        // Libérer l'arbre actuel
+        // Libï¿½rer l'arbre actuel
         supprimerArbre(abr);
-        // Restaurer l'arbre à partir de l'état suivant sauvegardé
+        // Restaurer l'arbre ï¿½ partir de l'ï¿½tat suivant sauvegardï¿½
         abr = g_array_index(next_abrs, T_Arbre, next_abrs->len - 1);
-        // Supprimer l'état suivant du tableau
+        // Supprimer l'ï¿½tat suivant du tableau
         g_array_remove_index(next_abrs, next_abrs->len - 1);
-        // Redessiner l'arbre avec l'état suivant
+        // Redessiner l'arbre avec l'ï¿½tat suivant
         gtk_widget_queue_draw(darea);
     }
 }
@@ -367,48 +410,54 @@ static gboolean on_key_press_event(GtkWidget *widget, GdkEventKey *event, gpoint
     return FALSE;
 }
 
+// Fonction pour rechercher un Ã©lÃ©ment dans l'arbre
 static void rechercher_un_element(GtkWidget *widget, gpointer entry) {
     const char *text = gtk_entry_get_text(GTK_ENTRY(entry));
     int element = atoi(text);
     T_Sommet *resultatRecherche = rechercherElement(abr, element);
     if (resultatRecherche != NULL) {
         append_to_message_view(g_strdup_printf("\n"));
-        append_to_message_view(g_strdup_printf("Element trouve dans l'intervalle [%d; %d].\n", resultatRecherche->borneInf, resultatRecherche->borneSup));
+        append_to_message_view(g_strdup_printf("Element trouvÃ© dans l'intervalle [%d; %d].\n", resultatRecherche->borneInf, resultatRecherche->borneSup));
     } else {
         append_to_message_view(g_strdup_printf("\n"));
-        append_to_message_view(g_strdup_printf("Erreur: Element non trouve.\n"));
+        append_to_message_view(g_strdup_printf("Erreur: Ã‰lÃ©ment non trouvÃ©.\n"));
         gtk_entry_set_text(GTK_ENTRY(entry), "");
     }
 }
 
+// Fonction pour afficher les sommets de l'arbre
 static void afficher_sommets(GtkWidget *widget, gpointer data) {
     append_to_message_view(g_strdup_printf("\n"));
     afficherSommets(abr);
     append_to_message_view(g_strdup_printf("Affichage des sommets de l'arbre:\n"));
 }
 
+// Fonction pour afficher les Ã©lÃ©ments de l'arbre
 static void afficher_elements(GtkWidget *widget, gpointer data) {
     append_to_message_view(g_strdup_printf("\n"));
     append_to_message_view(g_strdup_printf("\n"));
     afficherElements(abr);
-    append_to_message_view(g_strdup_printf("Affichage des elements de l'arbre:\n"));
+    append_to_message_view(g_strdup_printf("Affichage des Ã©lÃ©ments de l'arbre:\n"));
 }
 
+// Fonction pour afficher la taille mÃ©moire de l'arbre
 static void afficher_taille_memoire(GtkWidget *widget, gpointer data) {
     append_to_message_view(g_strdup_printf("\n"));
     tailleMemoire(abr);
 }
 
+// Fonction pour afficher la racine de l'arbre
 static void afficher_racine(GtkWidget *widget, gpointer data) {
     if (abr != NULL) {
         append_to_message_view(g_strdup_printf("\n"));
         append_to_message_view(g_strdup_printf("Racine de l'arbre: [%d; %d]\n", abr->borneInf, abr->borneSup));
     } else {
         append_to_message_view(g_strdup_printf("\n"));
-        append_to_message_view(g_strdup_printf("Erreur: L'arbre est vide, pas de racine a afficher.\n"));
+        append_to_message_view(g_strdup_printf("Erreur: L'arbre est vide, pas de racine Ã  afficher.\n"));
     }
 }
 
+// Fonction pour afficher le pÃ¨re d'un Ã©lÃ©ment
 static void afficher_pere(GtkWidget *widget, gpointer entry) {
     const char *text = gtk_entry_get_text(GTK_ENTRY(entry));
     if (strlen(text) == 0) {
@@ -426,14 +475,15 @@ static void afficher_pere(GtkWidget *widget, gpointer entry) {
     T_Sommet *pere = rechercherPere(abr, (int)element);
     if (pere != NULL) {
         append_to_message_view(g_strdup_printf("\n"));
-        append_to_message_view(g_strdup_printf("Pere de l'element %ld : [%d; %d].\n", element, pere->borneInf, pere->borneSup));
+        append_to_message_view(g_strdup_printf("PÃ¨re de l'Ã©lÃ©ment %ld : [%d; %d].\n", element, pere->borneInf, pere->borneSup));
     } else {
         append_to_message_view(g_strdup_printf("\n"));
-        append_to_message_view(g_strdup_printf("Erreur: Element non trouve ou racine de l'arbre.\n"));
+        append_to_message_view(g_strdup_printf("Erreur: Ã‰lÃ©ment non trouvÃ© ou racine de l'arbre.\n"));
     }
     gtk_entry_set_text(GTK_ENTRY(entry), "");
 }
 
+// Fonction pour afficher le niveau d'un Ã©lÃ©ment
 static void afficher_niveau(GtkWidget *widget, gpointer entry) {
     const char *text = gtk_entry_get_text(GTK_ENTRY(entry));
     if (strlen(text) == 0) {
@@ -451,14 +501,15 @@ static void afficher_niveau(GtkWidget *widget, gpointer entry) {
     int niveau = niveauDuSommet(abr, rechercherElement(abr, (int)element));
     if (niveau >= 0) {
         append_to_message_view(g_strdup_printf("\n"));
-        append_to_message_view(g_strdup_printf("Niveau de l'element %ld : %d.\n", element, niveau));
+        append_to_message_view(g_strdup_printf("Niveau de l'Ã©lÃ©ment %ld : %d.\n", element, niveau));
     } else {
         append_to_message_view(g_strdup_printf("\n"));
-        append_to_message_view(g_strdup_printf("Erreur: Element non trouve.\n"));
+        append_to_message_view(g_strdup_printf("Erreur: Ã‰lÃ©ment non trouvÃ©.\n"));
     }
     gtk_entry_set_text(GTK_ENTRY(entry), "");
 }
 
+// Fonction pour afficher la hauteur de l'arbre
 static void afficher_hauteur(GtkWidget *widget, gpointer entry) {
     int hauteur = rechercherHauteur(abr);
     if (hauteur > 0) {
@@ -471,6 +522,7 @@ static void afficher_hauteur(GtkWidget *widget, gpointer entry) {
     gtk_entry_set_text(GTK_ENTRY(entry), "");
 }
 
+// Fonction pour effacer le contenu de la vue de message
 static void clear_message_view() {
     GtkTextBuffer *buffer;
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
@@ -481,7 +533,7 @@ static void reinitialiser_arbre(GtkWidget *widget, gpointer data) {
     // Effacer le contenu de la zone de texte
     clear_message_view();
 
-    // Réinitialiser l'arbre
+    // Rï¿½initialiser l'arbre
     supprimerArbre(abr);
     abr = NULL;
     zoom_level = 1.0;
@@ -492,7 +544,7 @@ static void reinitialiser_arbre(GtkWidget *widget, gpointer data) {
 }
 
 void cleanup() {
-    // Libérer la mémoire allouée dynamiquement
+    // Libï¿½rer la mï¿½moire allouï¿½e dynamiquement
     if (previous_abrs != NULL) {
         g_array_free(previous_abrs, TRUE);
     }
@@ -504,10 +556,10 @@ void cleanup() {
     }
 }
 
-// Déclaration de la fenêtre pour l'écran de démarrage
+// Dï¿½claration de la fenï¿½tre pour l'ï¿½cran de dï¿½marrage
 GtkWidget *splash_window = NULL;
 
-// Fonction pour masquer ou fermer l'écran de démarrage
+// Fonction pour masquer ou fermer l'ï¿½cran de dï¿½marrage
 static void hide_splash_screen() {
     if (splash_window != NULL) {
         gtk_widget_destroy(splash_window);
@@ -515,28 +567,28 @@ static void hide_splash_screen() {
     }
 }
 
-// Fonction de rappel pour afficher la fenêtre principale après un délai
+// Fonction de rappel pour afficher la fenï¿½tre principale aprï¿½s un dï¿½lai
 static gboolean show_main_window(gpointer user_data) {
-    // Masquer l'écran de démarrage
+    // Masquer l'ï¿½cran de dï¿½marrage
     hide_splash_screen();
 
-    // Affichage de la fenêtre principale
+    // Affichage de la fenï¿½tre principale
     gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
     gtk_widget_show_all(window);
 
-    return G_SOURCE_REMOVE; // Supprimer la source de l'événement
+    return G_SOURCE_REMOVE; // Supprimer la source de l'ï¿½vï¿½nement
 }
 
-// Fonction pour créer et afficher l'écran de démarrage
+// Fonction pour crï¿½er et afficher l'ï¿½cran de dï¿½marrage
 static void show_splash_screen() {
-    // Création de la fenêtre
+    // Crï¿½ation de la fenï¿½tre
     splash_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_decorated(GTK_WINDOW(splash_window), FALSE); // Supprimer la décoration de la fenêtre
-    gtk_window_set_position(GTK_WINDOW(splash_window), GTK_WIN_POS_CENTER); // Centrer la fenêtre
+    gtk_window_set_decorated(GTK_WINDOW(splash_window), FALSE); // Supprimer la dï¿½coration de la fenï¿½tre
+    gtk_window_set_position(GTK_WINDOW(splash_window), GTK_WIN_POS_CENTER); // Centrer la fenï¿½tre
     gtk_window_set_default_size(GTK_WINDOW(splash_window), 1000, 500);
     gtk_widget_set_name(splash_window, "splash_window");
 
-    // Création de la boîte verticale pour le contenu de l'écran de démarrage
+    // Crï¿½ation de la boï¿½te verticale pour le contenu de l'ï¿½cran de dï¿½marrage
     GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(splash_window), vbox);
 
@@ -545,8 +597,8 @@ static void show_splash_screen() {
     gtk_widget_set_size_request(vbox_spacing_top, -1, 150); // Ajustez la hauteur pour centrer verticalement
     gtk_box_pack_start(GTK_BOX(vbox), vbox_spacing_top, FALSE, FALSE, 0);
 
-    // Création de la boîte horizontale pour l'icône et le label
-    GtkWidget *hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10); // Espacement de 10 pixels entre les éléments
+    // Crï¿½ation de la boï¿½te horizontale pour l'icï¿½ne et le label
+    GtkWidget *hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10); // Espacement de 10 pixels entre les ï¿½lï¿½ments
     gtk_box_set_homogeneous(GTK_BOX(hbox), FALSE);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
 
@@ -557,11 +609,11 @@ static void show_splash_screen() {
     gtk_image_set_from_pixbuf(GTK_IMAGE(image), scaled_pixbuf);
     gtk_widget_set_name(image, "splash_image");
 
-    // Création d'une boîte de remplissage pour centrer l'image et le label horizontalement
+    // Crï¿½ation d'une boï¿½te de remplissage pour centrer l'image et le label horizontalement
     GtkWidget *hbox_filler_left = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(GTK_BOX(hbox), hbox_filler_left, TRUE, TRUE, 0);
 
-    // Ajout de l'image à la boîte horizontale
+    // Ajout de l'image ï¿½ la boï¿½te horizontale
     gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
 
     // Ajout du label "Chargement en cours..." et agrandissement de la taille de la police
@@ -572,7 +624,7 @@ static void show_splash_screen() {
     gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
     gtk_widget_set_name(label, "splash_label");
 
-    // Création d'une boîte de remplissage pour centrer l'image et le label horizontalement
+    // Crï¿½ation d'une boï¿½te de remplissage pour centrer l'image et le label horizontalement
     GtkWidget *hbox_filler_right = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(GTK_BOX(hbox), hbox_filler_right, TRUE, TRUE, 0);
 
@@ -581,20 +633,20 @@ static void show_splash_screen() {
     gtk_widget_set_size_request(vbox_spacing_bottom, -1, 150); // Ajustez la hauteur pour centrer verticalement
     gtk_box_pack_start(GTK_BOX(vbox), vbox_spacing_bottom, FALSE, FALSE, 0);
 
-    // Affichage de la fenêtre
+    // Affichage de la fenï¿½tre
     gtk_widget_show_all(splash_window);
 
-    // Temporisation pour fermer l'écran de démarrage après quelques secondes (par exemple, 3 secondes)
+    // Temporisation pour fermer l'ï¿½cran de dï¿½marrage aprï¿½s quelques secondes (par exemple, 3 secondes)
     g_timeout_add(3000, show_main_window, NULL);
 }
 
 static void activate(GtkApplication *app, gpointer user_data) {
-    // Initialisation de la fenêtre principale
+    // Initialisation de la fenï¿½tre principale
     window = gtk_application_window_new(app);
     gtk_window_set_title(GTK_WINDOW(window), "Gestion d'Arbre Binaire");
     gtk_window_set_default_size(GTK_WINDOW(window), 1000, 800);
 
-    // Création de la barre de titre personnalisée
+    // Crï¿½ation de la barre de titre personnalisï¿½e
     GtkWidget *titlebar = gtk_header_bar_new();
     gtk_header_bar_set_title(GTK_HEADER_BAR(titlebar), "Gestion d'Arbre Binaire");
     gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(titlebar), TRUE);
@@ -603,19 +655,19 @@ static void activate(GtkApplication *app, gpointer user_data) {
     g_signal_connect(window, "destroy", G_CALLBACK(killProcess), NULL);
     #endif
 
-    // Création d'une boîte verticale pour contenir les éléments
+    // Crï¿½ation d'une boï¿½te verticale pour contenir les ï¿½lï¿½ments
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     gtk_container_add(GTK_CONTAINER(window), vbox);
 
-    // Création de la boîte horizontale pour les boutons
+    // Crï¿½ation de la boï¿½te horizontale pour les boutons
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 5);
 
-    // Création du champ de saisie
+    // Crï¿½ation du champ de saisie
     entry = gtk_entry_new();
     gtk_box_pack_start(GTK_BOX(hbox), entry, TRUE, TRUE, 5);
 
-    // Création et configuration des boutons
+    // Crï¿½ation et configuration des boutons
     button = gtk_button_new_with_label("Inserer Element");
     g_signal_connect(button, "clicked", G_CALLBACK(inserer_un_element), entry);
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 5);
@@ -628,7 +680,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
     g_signal_connect(button, "clicked", G_CALLBACK(rechercher_un_element), entry);
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 5);
 
-    // Création d'une nouvelle boîte horizontale pour les boutons suivants
+    // Crï¿½ation d'une nouvelle boï¿½te horizontale pour les boutons suivants
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 5);
 
@@ -665,7 +717,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
     g_signal_connect(button, "clicked", G_CALLBACK(reinitialiser_arbre), NULL);
     gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 5);
 
-    // Création de la zone de dessin
+    // Crï¿½ation de la zone de dessin
     darea = gtk_drawing_area_new();
     gtk_box_pack_start(GTK_BOX(vbox), darea, TRUE, TRUE, 5);
     g_signal_connect(G_OBJECT(darea), "draw", G_CALLBACK(on_draw_event), NULL);
@@ -673,16 +725,16 @@ static void activate(GtkApplication *app, gpointer user_data) {
     g_signal_connect(G_OBJECT(darea), "button-press-event", G_CALLBACK(on_button_press_event), NULL);
     g_signal_connect(G_OBJECT(darea), "button-release-event", G_CALLBACK(on_button_release_event), NULL);
     g_signal_connect(G_OBJECT(darea), "motion-notify-event", G_CALLBACK(on_motion_notify_event), NULL);
-    // Ajouter le gestionnaire d'événements pour la molette de la souris
-    // Ajouter le gestionnaire d'événements pour le double clic
+    // Ajouter le gestionnaire d'ï¿½vï¿½nements pour la molette de la souris
+    // Ajouter le gestionnaire d'ï¿½vï¿½nements pour le double clic
     gtk_widget_add_events(darea, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_SCROLL_MASK);
 
-    // Créer une nouvelle boîte horizontale pour inclure le bouton de recentrage
+    // Crï¿½er une nouvelle boï¿½te horizontale pour inclure le bouton de recentrage
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 5);
-    gtk_widget_set_visible(hbox, FALSE); // Rendre la boîte horizontale invisible (marche pas)
+    gtk_widget_set_visible(hbox, FALSE); // Rendre la boï¿½te horizontale invisible (marche pas)
 
-    // Création du bouton de recentrage
+    // Crï¿½ation du bouton de recentrage
     button = gtk_button_new_with_label("Avancer");
     g_signal_connect(button, "clicked", G_CALLBACK(avancer_etat_suivant), NULL);
     gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 5);
@@ -701,17 +753,17 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
 
     zoom_level_label = gtk_label_new("Zoom : 100%");
-    gtk_widget_set_opacity(GTK_WIDGET(zoom_level_label), 0.5); // Réglez l'opacité à 50%
+    gtk_widget_set_opacity(GTK_WIDGET(zoom_level_label), 0.5); // Rï¿½glez l'opacitï¿½ ï¿½ 50%
     gtk_box_pack_end(GTK_BOX(hbox), zoom_level_label, FALSE, FALSE, 5);
 
-    // Création du cadre pour encadrer la zone de texte et la zone de dessin
+    // Crï¿½ation du cadre pour encadrer la zone de texte et la zone de dessin
     GtkWidget *frame = gtk_frame_new("Messages");
     gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 5);
     gtk_frame_set_label_align(GTK_FRAME(frame), 0.5, 0.5); // Centre le titre
 
-    // Création de la zone de texte pour les messages
+    // Crï¿½ation de la zone de texte pour les messages
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-    gtk_widget_set_size_request(scrolled_window, -1, 100); // Taille minimale pour être visible
+    gtk_widget_set_size_request(scrolled_window, -1, 100); // Taille minimale pour ï¿½tre visible
     gtk_container_add(GTK_CONTAINER(frame), scrolled_window);
 
     text_view = gtk_text_view_new();
@@ -742,16 +794,16 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
     gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-    // Afficher l'écran de démarrage
+    // Afficher l'ï¿½cran de dï¿½marrage
     show_splash_screen();
 }
 
 int main(int argc, char **argv) {
-    // Masquer la fenêtre de console sur Windows
+    // Masquer la fenï¿½tre de console sur Windows
     #ifdef _WIN32
     HWND consoleWindow = GetConsoleWindow();
     if (consoleWindow != NULL) {
-        ShowWindow(consoleWindow, SW_SHOWMINIMIZED); // Minimiser la fenêtre de la console
+        ShowWindow(consoleWindow, SW_SHOWMINIMIZED); // Minimiser la fenï¿½tre de la console
     }
     #endif
 
