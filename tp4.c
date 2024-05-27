@@ -267,40 +267,23 @@ T_Arbre fusionnerSommets(T_Arbre abr) {
     return abr;
 }
 
-// Rotation gauche
 T_Arbre rotationGauche(T_Arbre abr) {
-    if (abr == NULL || abr->filsDroit == NULL) {
-        return abr;
-    }
-
-    T_Arbre nouvelleRacine = abr->filsDroit;
-    abr->filsDroit = nouvelleRacine->filsGauche;
-    nouvelleRacine->filsGauche = abr;
-    return nouvelleRacine;
+    T_Arbre nouvelArbre = abr->filsDroit;
+    abr->filsDroit = nouvelArbre->filsGauche;
+    nouvelArbre->filsGauche = abr;
+    return nouvelArbre;
 }
 
-// Rotation droite
 T_Arbre rotationDroite(T_Arbre abr) {
-    if (abr == NULL || abr->filsGauche == NULL) {
-        return abr;
-    }
-
-    T_Arbre nouvelleRacine = abr->filsGauche;
-    abr->filsGauche = nouvelleRacine->filsDroit;
-    nouvelleRacine->filsDroit = abr;
-    return nouvelleRacine;
+    T_Arbre nouvelArbre = abr->filsGauche;
+    abr->filsGauche = nouvelArbre->filsDroit;
+    nouvelArbre->filsDroit = abr;
+    return nouvelArbre;
 }
 
-// Équilibrage de l'arbre
 T_Arbre equilibrerArbre(T_Arbre abr) {
-    if (abr == NULL) {
-        return NULL;
-    }
-
-    int verifhauteurGauche = rechercherHauteur(abr->filsGauche);
-    int verifhauteurDroit = rechercherHauteur(abr->filsDroit);
-
-    if (abs(verifhauteurGauche - verifhauteurDroit) <= 1) {
+    // Cas de base : si l'arbre est vide ou s'il s'agit d'un singleton, il est déjà équilibré
+    if (abr == NULL || (abr->filsGauche == NULL && abr->filsDroit == NULL)) {
         return abr;
     }
 
@@ -308,32 +291,38 @@ T_Arbre equilibrerArbre(T_Arbre abr) {
     abr->filsGauche = equilibrerArbre(abr->filsGauche);
     abr->filsDroit = equilibrerArbre(abr->filsDroit);
 
-    // Calculer la hauteur des sous-arbres gauche et droit
+    // Calculer les hauteurs des sous-arbres
     int hauteurGauche = rechercherHauteur(abr->filsGauche);
     int hauteurDroit = rechercherHauteur(abr->filsDroit);
 
-    // Vérifier l'équilibre de l'arbre et effectuer les rotations si nécessaire
-    if (hauteurGauche - hauteurDroit > 1) {
-        // Déséquilibre à gauche
-        if (rechercherHauteur(abr->filsGauche->filsGauche) < rechercherHauteur(abr->filsGauche->filsDroit)) {
-            // Double rotation gauche-droite
+    // Calculer la différence de hauteur
+    int diffHauteur = hauteurGauche - hauteurDroit;
+
+    // Si la différence de hauteur est supérieure à 1, l'arbre est déséquilibré
+    if (diffHauteur > 1) {
+        // Cas de rotation simple à droite
+        if (rechercherHauteur(abr->filsGauche->filsGauche) >= rechercherHauteur(abr->filsGauche->filsDroit)) {
+            abr = rotationDroite(abr);
+        }
+        // Cas de rotation double à gauche-droite
+        else {
             abr->filsGauche = rotationGauche(abr->filsGauche);
+            abr = rotationDroite(abr);
         }
-        // Rotation droite simple
-        abr = rotationDroite(abr);
-    } else if (hauteurDroit - hauteurGauche > 1) {
-        // Déséquilibre à droite
-        if (rechercherHauteur(abr->filsDroit->filsDroit) < rechercherHauteur(abr->filsDroit->filsGauche)) {
-            // Double rotation droite-gauche
+    } else if (diffHauteur < -1) {
+        // Cas de rotation simple à gauche
+        if (rechercherHauteur(abr->filsDroit->filsDroit) >= rechercherHauteur(abr->filsDroit->filsGauche)) {
+            abr = rotationGauche(abr);
+        }
+        // Cas de rotation double à droite-gauche
+        else {
             abr->filsDroit = rotationDroite(abr->filsDroit);
+            abr = rotationGauche(abr);
         }
-        // Rotation gauche simple
-        abr = rotationGauche(abr);
     }
 
     return abr;
 }
-
 
 
 
