@@ -291,6 +291,11 @@ T_Arbre equilibrerArbre(T_Arbre abr) {
     abr->filsGauche = equilibrerArbre(abr->filsGauche);
     abr->filsDroit = equilibrerArbre(abr->filsDroit);
 
+    // Vérifier si l'arbre est déjà équilibré
+    if ((abr->filsGauche == NULL && abr->filsDroit != NULL) || (abr->filsGauche != NULL && abr->filsDroit == NULL)) {
+        return abr; // Si un seul sous-arbre est manquant, l'arbre est déjà équilibré
+    }
+
     // Calculer les hauteurs des sous-arbres
     int hauteurGauche = rechercherHauteur(abr->filsGauche);
     int hauteurDroit = rechercherHauteur(abr->filsDroit);
@@ -323,6 +328,7 @@ T_Arbre equilibrerArbre(T_Arbre abr) {
 
     return abr;
 }
+
 
 
 
