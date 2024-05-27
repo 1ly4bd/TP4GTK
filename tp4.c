@@ -267,6 +267,69 @@ T_Arbre fusionnerSommets(T_Arbre abr) {
     return abr;
 }
 
+// Rotation gauche
+T_Arbre rotationGauche(T_Arbre abr) {
+    if (abr == NULL || abr->filsDroit == NULL) {
+        return abr;
+    }
+
+    T_Arbre nouvelleRacine = abr->filsDroit;
+    abr->filsDroit = nouvelleRacine->filsGauche;
+    nouvelleRacine->filsGauche = abr;
+    return nouvelleRacine;
+}
+
+// Rotation droite
+T_Arbre rotationDroite(T_Arbre abr) {
+    if (abr == NULL || abr->filsGauche == NULL) {
+        return abr;
+    }
+
+    T_Arbre nouvelleRacine = abr->filsGauche;
+    abr->filsGauche = nouvelleRacine->filsDroit;
+    nouvelleRacine->filsDroit = abr;
+    return nouvelleRacine;
+}
+
+// Équilibrage de l'arbre
+T_Arbre equilibrerArbre(T_Arbre abr) {
+    if (abr == NULL) {
+        return NULL;
+    }
+
+    // Équilibrer les sous-arbres gauche et droit
+    abr->filsGauche = equilibrerArbre(abr->filsGauche);
+    abr->filsDroit = equilibrerArbre(abr->filsDroit);
+
+    // Calculer la hauteur des sous-arbres gauche et droit
+    int hauteurGauche = rechercherHauteur(abr->filsGauche);
+    int hauteurDroit = rechercherHauteur(abr->filsDroit);
+
+    // Vérifier l'équilibre de l'arbre et effectuer les rotations si nécessaire
+    if (hauteurGauche - hauteurDroit > 1) {
+        // Déséquilibre à gauche
+        if (rechercherHauteur(abr->filsGauche->filsGauche) < rechercherHauteur(abr->filsGauche->filsDroit)) {
+            // Double rotation gauche-droite
+            abr->filsGauche = rotationGauche(abr->filsGauche);
+        }
+        // Rotation droite simple
+        abr = rotationDroite(abr);
+    } else if (hauteurDroit - hauteurGauche > 1) {
+        // Déséquilibre à droite
+        if (rechercherHauteur(abr->filsDroit->filsDroit) < rechercherHauteur(abr->filsDroit->filsGauche)) {
+            // Double rotation droite-gauche
+            abr->filsDroit = rotationDroite(abr->filsDroit);
+        }
+        // Rotation gauche simple
+        abr = rotationGauche(abr);
+    }
+
+    return abr;
+}
+
+
+
+
 
 
 

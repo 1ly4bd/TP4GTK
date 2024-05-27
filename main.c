@@ -540,7 +540,25 @@ static void reinitialiser_arbre(GtkWidget *widget, gpointer data) {
     recentrer_arbre(darea, abr);
     reset_zoom_level(darea, abr);
     gtk_widget_queue_draw(darea);
+    previous_abrs = NULL;
+    next_abrs = NULL;
     append_to_message_view(g_strdup_printf("Arbre reinitialise.\n"));
+}
+
+static void equilibrer_arbre(GtkWidget *widget, gpointer data) {
+    // Vérifie si l'arbre n'est pas vide
+    if (abr != NULL) {
+        sauvegarder_etat_precedent();
+        equilibrerArbre(abr);
+        // Affiche un message indiquant que l'arbre a été équilibré
+        append_to_message_view(g_strdup_printf("\n"));
+        append_to_message_view(g_strdup_printf("Arbre équilibré.\n"));
+    } else {
+        // Si l'arbre est vide, affiche un message d'erreur
+        append_to_message_view(g_strdup_printf("\n"));
+        append_to_message_view(g_strdup_printf("Erreur: L'arbre est vide, pas d'arbre à équilibrer.\n"));
+    }
+    gtk_widget_queue_draw(darea);
 }
 
 void cleanup() {
@@ -712,9 +730,8 @@ static void activate(GtkApplication *app, gpointer user_data) {
     g_signal_connect(button, "clicked", G_CALLBACK(afficher_hauteur), entry);
     gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 5);
 
-
-    button = gtk_button_new_with_label("Reinitialiser Arbre");
-    g_signal_connect(button, "clicked", G_CALLBACK(reinitialiser_arbre), NULL);
+    button = gtk_button_new_with_label("Equilibrer Arbre");
+    g_signal_connect(button, "clicked", G_CALLBACK(equilibrer_arbre), NULL);
     gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 5);
 
     // Cr�ation de la zone de dessin
@@ -735,6 +752,10 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_widget_set_visible(hbox, FALSE); // Rendre la bo�te horizontale invisible (marche pas)
 
     // Cr�ation des boutons de recentrage, retour, avancement et zoom
+    button = gtk_button_new_with_label("Reinitialiser Arbre");
+    g_signal_connect(button, "clicked", G_CALLBACK(reinitialiser_arbre), NULL);
+    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 5);
+
     button = gtk_button_new_with_label("Avancer");
     g_signal_connect(button, "clicked", G_CALLBACK(avancer_etat_suivant), NULL);
     gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 5);
