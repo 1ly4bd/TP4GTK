@@ -297,6 +297,13 @@ T_Arbre equilibrerArbre(T_Arbre abr) {
         return NULL;
     }
 
+    int verifhauteurGauche = rechercherHauteur(abr->filsGauche);
+    int verifhauteurDroit = rechercherHauteur(abr->filsDroit);
+
+    if (abs(verifhauteurGauche - verifhauteurDroit) <= 1) {
+        return abr;
+    }
+
     // Équilibrer les sous-arbres gauche et droit
     abr->filsGauche = equilibrerArbre(abr->filsGauche);
     abr->filsDroit = equilibrerArbre(abr->filsDroit);
