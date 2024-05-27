@@ -47,7 +47,7 @@ T_Sommet *rechercherElement(T_Arbre abr, int element) {
     }
 }
 
-// Fonction pour rechercher le pËre d'un ÈlÈment
+// Fonction pour rechercher le p√®re d'un √©l√©ment
 T_Sommet* rechercherPere(T_Arbre abr, int element) {
     if (abr == NULL || (abr->filsGauche == NULL && abr->filsDroit == NULL)) {
         return NULL;
@@ -67,7 +67,7 @@ T_Sommet* rechercherPere(T_Arbre abr, int element) {
 }
 
 int niveauDuSommet(T_Arbre racine, T_Sommet *sommet) {
-    // Si le sommet est NULL, retourne -1 (niveau non trouvÈ)
+    // Si le sommet est NULL, retourne -1 (niveau non trouv√©)
     if (sommet == NULL) {
         return -1;
     }
@@ -75,10 +75,10 @@ int niveauDuSommet(T_Arbre racine, T_Sommet *sommet) {
     int niveau = 0;
     T_Sommet *pere = rechercherPere(racine, sommet->borneInf);
 
-    // Tant qu'il y a un pËre, on continue de remonter vers la racine
+    // Tant qu'il y a un p√®re, on continue de remonter vers la racine
     while (pere != NULL) {
-        niveau++; // IncrÈmente le niveau ‡ chaque Ètape
-        pere = rechercherPere(racine, pere->borneInf); // Recherche le pËre du pËre
+        niveau++; // Incr√©mente le niveau √† chaque √©tape
+        pere = rechercherPere(racine, pere->borneInf); // Recherche le p√®re du p√®re
     }
 
     return niveau;
@@ -92,7 +92,7 @@ int rechercherHauteur(T_Arbre abr) {
     int hauteurGauche = rechercherHauteur(abr->filsGauche);
     int hauteurDroit = rechercherHauteur(abr->filsDroit);
 
-    return 1 + max(hauteurGauche, hauteurDroit); // Ajoutez 1 pour inclure le núud actuel
+    return 1 + max(hauteurGauche, hauteurDroit); // Ajoutez 1 pour inclure le n≈ìud actuel
 }
 
 
@@ -148,7 +148,7 @@ T_Arbre supprimerElement(T_Arbre abr, int element) {
                 }
                 free(abr);
                 append_to_message_view(g_strdup_printf("\n"));
-                append_to_message_view(g_strdup_printf("Suppression de %d.\n", element)); // Affichage d'un message indiquant la suppression rÈussie
+                append_to_message_view(g_strdup_printf("Suppression de %d.\n", element)); // Affichage d'un message indiquant la suppression r√©ussie
                 return fusionnerSommets(nouvelleRacine);
             }
         } else {
@@ -157,12 +157,12 @@ T_Arbre supprimerElement(T_Arbre abr, int element) {
             } else if (element == abr->borneSup) {
                 abr->borneSup--;
             } else {
-                // CrÈer un nouveau sommet pour [borneInf, element - 1]
+                // Cr√©er un nouveau sommet pour [borneInf, element - 1]
                 T_Sommet *nouveauGauche = creerSommet(abr->borneInf);
                 nouveauGauche->borneSup = element - 1;
                 nouveauGauche->filsGauche = abr->filsGauche;
 
-                // CrÈer un nouveau sommet pour [element + 1, borneSup]
+                // Cr√©er un nouveau sommet pour [element + 1, borneSup]
                 T_Sommet *nouveauDroit = creerSommet(element + 1);
                 nouveauDroit->borneSup = abr->borneSup;
                 nouveauDroit->filsDroit = abr->filsDroit;
@@ -189,7 +189,7 @@ T_Arbre supprimerElement(T_Arbre abr, int element) {
                     nouveauGauche = insererElement(nouveauGauche, x);
                 }}
 
-                // LibÈrer le núud actuel
+                // Lib√©rer le n≈ìud actuel
                 free(abr);
 
                 // Retourner le nouveau sous-arbre avec les deux nouveaux sommets
@@ -242,23 +242,23 @@ T_Arbre fusionnerSommets(T_Arbre abr) {
     abr->filsGauche = fusionnerSommets(abr->filsGauche);
     abr->filsDroit = fusionnerSommets(abr->filsDroit);
 
-    // Fusionner les sommets consÈcutifs ‡ gauche
+    // Fusionner les sommets cons√©cutifs √† gauche
     if (abr->filsGauche != NULL && abr->filsGauche->borneSup + 1 >= abr->borneInf) {
-        // Mettre ‡ jour la borneInf du sommet actuel
+        // Mettre √† jour la borneInf du sommet actuel
         abr->borneInf = abr->filsGauche->borneInf;
 
-        // Supprimer le sommet fusionnÈ
+        // Supprimer le sommet fusionn√©
         T_Sommet *temp = abr->filsGauche;
         abr->filsGauche = abr->filsGauche->filsGauche;
         free(temp);
     }
 
-    // Fusionner les sommets consÈcutifs ‡ droite
+    // Fusionner les sommets cons√©cutifs √† droite
     if (abr->filsDroit != NULL && abr->filsDroit->borneInf <= abr->borneSup + 1) {
-        // Mettre ‡ jour la borneSup du sommet actuel
+        // Mettre √† jour la borneSup du sommet actuel
         abr->borneSup = abr->filsDroit->borneSup;
 
-        // Supprimer le sommet fusionnÈ
+        // Supprimer le sommet fusionn√©
         T_Sommet *temp = abr->filsDroit;
         abr->filsDroit = abr->filsDroit->filsDroit;
         free(temp);
@@ -267,67 +267,84 @@ T_Arbre fusionnerSommets(T_Arbre abr) {
     return abr;
 }
 
+// Effectue une rotation √† gauche sur l'arbre pour √©quilibrer les hauteurs des sous-arbres.
 T_Arbre rotationGauche(T_Arbre abr) {
+    printf("Rotation gauche.\n");
+    // Sauvegarde le sous-arbre droit du n≈ìud actuel
     T_Arbre nouvelArbre = abr->filsDroit;
+    // Le sous-arbre gauche du sous-arbre droit devient le nouveau sous-arbre droit du n≈ìud actuel
     abr->filsDroit = nouvelArbre->filsGauche;
+    // Le n≈ìud actuel devient le sous-arbre gauche du sous-arbre droit
     nouvelArbre->filsGauche = abr;
+    // Retourne le nouvel arbre √©quilibr√©
     return nouvelArbre;
 }
 
+// Effectue une rotation √† droite sur l'arbre pour √©quilibrer les hauteurs des sous-arbres.
 T_Arbre rotationDroite(T_Arbre abr) {
+    printf("Rotation droite.\n");
+    // Sauvegarde le sous-arbre gauche du n≈ìud actuel
     T_Arbre nouvelArbre = abr->filsGauche;
+    // Le sous-arbre droit du sous-arbre gauche devient le nouveau sous-arbre gauche du n≈ìud actuel
     abr->filsGauche = nouvelArbre->filsDroit;
+    // Le n≈ìud actuel devient le sous-arbre droit du sous-arbre gauche
     nouvelArbre->filsDroit = abr;
+    // Retourne le nouvel arbre √©quilibr√©
     return nouvelArbre;
 }
 
+// √âquilibre l'arbre en effectuant des rotations selon les cas de d√©s√©quilibre.
 T_Arbre equilibrerArbre(T_Arbre abr) {
-    // Cas de base : si l'arbre est vide ou s'il s'agit d'un singleton, il est dÈj‡ ÈquilibrÈ
-    if (abr == NULL || (abr->filsGauche == NULL && abr->filsDroit == NULL)) {
-        return abr;
+    if (abr == NULL) {
+        return NULL;
     }
 
-    // …quilibrer les sous-arbres gauche et droit
+    // √âquilibrer les sous-arbres gauche et droit r√©cursivement
     abr->filsGauche = equilibrerArbre(abr->filsGauche);
     abr->filsDroit = equilibrerArbre(abr->filsDroit);
 
-    // VÈrifier si l'arbre est dÈj‡ ÈquilibrÈ
-    if ((abr->filsGauche == NULL && abr->filsDroit != NULL) || (abr->filsGauche != NULL && abr->filsDroit == NULL)) {
-        return abr; // Si un seul sous-arbre est manquant, l'arbre est dÈj‡ ÈquilibrÈ
-    }
-
-    // Calculer les hauteurs des sous-arbres
+    // Calculer les hauteurs des sous-arbres gauche et droit
     int hauteurGauche = rechercherHauteur(abr->filsGauche);
     int hauteurDroit = rechercherHauteur(abr->filsDroit);
 
-    // Calculer la diffÈrence de hauteur
+    // Calculer la diff√©rence de hauteur
     int diffHauteur = hauteurGauche - hauteurDroit;
 
-    // Si la diffÈrence de hauteur est supÈrieure ‡ 1, l'arbre est dÈsÈquilibrÈ
+    // Cas de d√©s√©quilibre √† gauche
     if (diffHauteur > 1) {
-        // Cas de rotation simple ‡ droite
+        // Cas de rotation simple √† droite
         if (rechercherHauteur(abr->filsGauche->filsGauche) >= rechercherHauteur(abr->filsGauche->filsDroit)) {
+            printf("Cas de rotation simple √† droite.\n");
             abr = rotationDroite(abr);
         }
-        // Cas de rotation double ‡ gauche-droite
+        // Cas de rotation double √† gauche-droite
         else {
+            printf("Cas de rotation double √† gauche-droite.\n");
             abr->filsGauche = rotationGauche(abr->filsGauche);
             abr = rotationDroite(abr);
         }
-    } else if (diffHauteur < -1) {
-        // Cas de rotation simple ‡ gauche
+    }
+    // Cas de d√©s√©quilibre √† droite
+    else if (diffHauteur < -1) {
+        // Cas de rotation simple √† gauche
         if (rechercherHauteur(abr->filsDroit->filsDroit) >= rechercherHauteur(abr->filsDroit->filsGauche)) {
+            printf("Cas de rotation simple √† gauche.\n");
             abr = rotationGauche(abr);
         }
-        // Cas de rotation double ‡ droite-gauche
+        // Cas de rotation double √† droite-gauche
         else {
+            printf("Cas de rotation double √† droite-gauche.\n");
             abr->filsDroit = rotationDroite(abr->filsDroit);
             abr = rotationGauche(abr);
         }
     }
 
+    // Retourne l'arbre √©quilibr√©
     return abr;
 }
+
+
+
 
 
 

@@ -2,10 +2,10 @@
 #define TP4_H
 
 typedef struct T_Sommet T_Sommet;
-typedef struct T_Sommet2 T_Sommet2; // Simule un sommet classique (caractérisé par un entier unique plutôt que des bornes inf et sup)
+typedef struct T_Sommet2 T_Sommet2; // Simule un sommet classique (caractÃ©risÃ© par un entier unique plutÃ´t que des bornes inf et sup)
 typedef T_Sommet* T_Arbre;
 
-// Désactivation du remplissage automatique pour T_Sommet
+// DÃ©sactivation du remplissage automatique pour T_Sommet
 #pragma pack(1)
 struct T_Sommet {
     int borneInf;
@@ -14,7 +14,7 @@ struct T_Sommet {
     T_Arbre filsDroit;
 };
 
-// Désactivation du remplissage automatique pour T_Sommet2
+// DÃ©sactivation du remplissage automatique pour T_Sommet2
 struct T_Sommet2 {
     int element;
     T_Arbre filsGauche;
