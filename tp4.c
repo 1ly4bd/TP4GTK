@@ -229,8 +229,10 @@ T_Arbre supprimerElement(T_Arbre abr, int element) {
                         nouveauGauche = insererElement(nouveauGauche, x);
                     }
                 }
-                // Libérer le sommet actuel
-                free(abr);
+                 // Vérifier si abr n'est pas nul avant de le libérer
+                if (abr != NULL) {
+                    free(abr);
+                }
                 // Retourner le nouveau sous-arbre avec les deux nouveaux sommets
                 fusionnerSommets(nouveauGauche);
                 return (nouveauGauche);

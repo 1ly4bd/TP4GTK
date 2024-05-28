@@ -794,9 +794,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_widget_override_background_color(text_view, GTK_STATE_FLAG_NORMAL, &transparent);
 
     g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press_event), NULL);
-    #ifdef _WIN32
-    g_signal_connect(window, "destroy", G_CALLBACK(killProcess), NULL);
-    #endif
+
 
     // Charger le fichier CSS
     GtkCssProvider *provider;
