@@ -588,6 +588,7 @@ static gboolean show_main_window(gpointer user_data) {
 
 // Fonction pour cr�er et afficher l'�cran de d�marrage
 static void show_splash_screen() {
+    GtkWidget *spinner;
     // Cr�ation de la fen�tre
     splash_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_decorated(GTK_WINDOW(splash_window), FALSE); // Supprimer la d�coration de la fen�tre
@@ -624,12 +625,19 @@ static void show_splash_screen() {
     gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
 
     // Ajout du label "Chargement en cours..." et agrandissement de la taille de la police
-    GtkWidget *label = gtk_label_new("Chargement en cours...");
+    GtkWidget *label = gtk_label_new("Chargement en cours");
     PangoFontDescription *font_desc = pango_font_description_from_string("Segoe UI 24"); // Agrandir la taille de la police
     gtk_widget_override_font(label, font_desc);
     pango_font_description_free(font_desc);
     gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
     gtk_widget_set_name(label, "splash_label");
+
+    // Création du widget spinner
+    spinner = gtk_spinner_new();
+    gtk_box_pack_start(GTK_BOX(hbox), spinner, TRUE, TRUE, 0);
+
+    // Démarrage de l'animation du spinner
+    gtk_spinner_start(GTK_SPINNER(spinner));
 
     // Cr�ation d'une bo�te de remplissage pour centrer l'image et le label horizontalement
     GtkWidget *hbox_filler_right = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -643,8 +651,8 @@ static void show_splash_screen() {
     // Affichage de la fen�tre
     gtk_widget_show_all(splash_window);
 
-    // Temporisation pour fermer l'�cran de d�marrage apr�s quelques secondes (par exemple, 1.5 secondes)
-    g_timeout_add(1500, show_main_window, NULL);
+    // Temporisation pour fermer l'�cran de d�marrage apr�s quelques secondes (par exemple, 2 secondes)
+    g_timeout_add(2000, show_main_window, NULL);
 }
 
 static void activate(GtkApplication *app, gpointer user_data) {
@@ -658,9 +666,6 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_header_bar_set_title(GTK_HEADER_BAR(titlebar), "Gestion d'Arbre Binaire");
     gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(titlebar), TRUE);
     gtk_window_set_titlebar(GTK_WINDOW(window), titlebar);
-    #ifdef _WIN32
-    g_signal_connect(window, "destroy", G_CALLBACK(killProcess), NULL);
-    #endif
 
     // Cr�ation d'une bo�te verticale pour contenir les �l�ments
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
