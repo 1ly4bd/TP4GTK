@@ -294,10 +294,9 @@ void ItererFusion(T_Arbre racine, T_Arbre abr) {
         return;
     }
 
-    // Afficher l'intervalle si le sommet en cours peut fusionner avec la racine
+    // Fusion si le sommet en cours peut fusionner avec la racine
     if (abr != racine && ((abr->borneInf <= racine->borneSup + 1 && abr->borneSup >= racine->borneInf - 1) ||
         (racine->borneInf <= abr->borneSup + 1 && racine->borneSup >= abr->borneInf - 1))) {
-            append_to_message_view(g_strdup_printf("[%d; %d]\n", abr->borneInf, abr->borneSup));
 
             int abrborneinf = abr->borneInf;
             int abrbornesup = abr->borneSup;
