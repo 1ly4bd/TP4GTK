@@ -267,29 +267,17 @@ T_Arbre fusionnerSommets(T_Arbre abr) {
     return abr;
 }
 
-// Effectue une rotation à gauche sur l'arbre pour équilibrer les hauteurs des sous-arbres.
 T_Arbre rotationGauche(T_Arbre abr) {
-    printf("Rotation gauche.\n");
-    // Sauvegarde le sous-arbre droit du nœud actuel
     T_Arbre nouvelArbre = abr->filsDroit;
-    // Le sous-arbre gauche du sous-arbre droit devient le nouveau sous-arbre droit du nœud actuel
     abr->filsDroit = nouvelArbre->filsGauche;
-    // Le nœud actuel devient le sous-arbre gauche du sous-arbre droit
     nouvelArbre->filsGauche = abr;
-    // Retourne le nouvel arbre équilibré
     return nouvelArbre;
 }
 
-// Effectue une rotation à droite sur l'arbre pour équilibrer les hauteurs des sous-arbres.
 T_Arbre rotationDroite(T_Arbre abr) {
-    printf("Rotation droite.\n");
-    // Sauvegarde le sous-arbre gauche du nœud actuel
     T_Arbre nouvelArbre = abr->filsGauche;
-    // Le sous-arbre droit du sous-arbre gauche devient le nouveau sous-arbre gauche du nœud actuel
     abr->filsGauche = nouvelArbre->filsDroit;
-    // Le nœud actuel devient le sous-arbre droit du sous-arbre gauche
     nouvelArbre->filsDroit = abr;
-    // Retourne le nouvel arbre équilibré
     return nouvelArbre;
 }
 
@@ -342,8 +330,6 @@ T_Arbre equilibrerArbre(T_Arbre abr) {
     // Retourne l'arbre équilibré
     return abr;
 }
-
-
 
 
 
