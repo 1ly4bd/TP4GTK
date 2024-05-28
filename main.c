@@ -550,22 +550,6 @@ static void reinitialiser_arbre(GtkWidget *widget, gpointer data) {
     append_to_message_view(g_strdup_printf("Arbre reinitialise.\n"));
 }
 
-static void equilibrer_arbre(GtkWidget *widget, gpointer data) {
-    // Vérifie si l'arbre n'est pas vide
-    if (abr != NULL) {
-        sauvegarder_etat_precedent();
-        equilibrerArbre(abr);
-        // Affiche un message indiquant que l'arbre a été équilibré
-        append_to_message_view(g_strdup_printf("\n"));
-        append_to_message_view(g_strdup_printf("Arbre équilibré.\n"));
-    } else {
-        // Si l'arbre est vide, affiche un message d'erreur
-        append_to_message_view(g_strdup_printf("\n"));
-        append_to_message_view(g_strdup_printf("Erreur: L'arbre est vide, pas d'arbre à équilibrer.\n"));
-    }
-    gtk_widget_queue_draw(darea);
-}
-
 void cleanup() {
     // Lib�rer la m�moire allou�e dynamiquement
     if (previous_abrs != NULL) {
@@ -659,8 +643,8 @@ static void show_splash_screen() {
     // Affichage de la fen�tre
     gtk_widget_show_all(splash_window);
 
-    // Temporisation pour fermer l'�cran de d�marrage apr�s quelques secondes (par exemple, 2 secondes)
-    g_timeout_add(2000, show_main_window, NULL);
+    // Temporisation pour fermer l'�cran de d�marrage apr�s quelques secondes (par exemple, 1.5 secondes)
+    g_timeout_add(1500, show_main_window, NULL);
 }
 
 static void activate(GtkApplication *app, gpointer user_data) {
@@ -715,14 +699,6 @@ static void activate(GtkApplication *app, gpointer user_data) {
     g_signal_connect(button, "clicked", G_CALLBACK(afficher_sommets), NULL);
     gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 5);
 
-    button = gtk_button_new_with_label("Afficher Taille Memoire");
-    g_signal_connect(button, "clicked", G_CALLBACK(afficher_taille_memoire), NULL);
-    gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 5);
-
-    button = gtk_button_new_with_label("Afficher Racine");
-    g_signal_connect(button, "clicked", G_CALLBACK(afficher_racine), NULL);
-    gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 5);
-
     button = gtk_button_new_with_label("Afficher Pere");
     g_signal_connect(button, "clicked", G_CALLBACK(afficher_pere), entry);
     gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 5);
@@ -731,12 +707,16 @@ static void activate(GtkApplication *app, gpointer user_data) {
     g_signal_connect(button, "clicked", G_CALLBACK(afficher_niveau), entry);
     gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 5);
 
+    button = gtk_button_new_with_label("Afficher Racine");
+    g_signal_connect(button, "clicked", G_CALLBACK(afficher_racine), NULL);
+    gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 5);
+
     button = gtk_button_new_with_label("Afficher Hauteur");
     g_signal_connect(button, "clicked", G_CALLBACK(afficher_hauteur), entry);
     gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 5);
 
-    button = gtk_button_new_with_label("Equilibrer Arbre");
-    g_signal_connect(button, "clicked", G_CALLBACK(equilibrer_arbre), NULL);
+    button = gtk_button_new_with_label("Afficher Taille Memoire");
+    g_signal_connect(button, "clicked", G_CALLBACK(afficher_taille_memoire), NULL);
     gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 5);
 
     // Cr�ation de la zone de dessin
