@@ -42,7 +42,8 @@ T_Arbre insererElement(T_Arbre abr, int element) {
         // Insérer l'élément dans le sous-arbre droit
         abr->filsDroit = insererElement(abr->filsDroit, element);
     }
-    return fusionnerSommets(abr);
+    fusionnerSommets(abr);
+    return (abr);
 }
 
 // Fonction pour rechercher un élément dans un arbre
@@ -180,7 +181,8 @@ T_Arbre supprimerElement(T_Arbre abr, int element) {
                 free(abr);
                 append_to_message_view(g_strdup_printf("\n"));
                 append_to_message_view(g_strdup_printf("Suppression de %d.\n", element)); // Afficher un message indiquant la suppression réussie
-                return fusionnerSommets(nouvelleRacine);
+                fusionnerSommets(nouvelleRacine);
+                return (nouvelleRacine);
             }
         }
         // Si le sommet actuel n'est pas une feuille
@@ -230,11 +232,13 @@ T_Arbre supprimerElement(T_Arbre abr, int element) {
                 // Libérer le sommet actuel
                 free(abr);
                 // Retourner le nouveau sous-arbre avec les deux nouveaux sommets
-                return fusionnerSommets(nouveauGauche);
+                fusionnerSommets(nouveauGauche);
+                return (nouveauGauche);
             }
         }
     }
-    return fusionnerSommets(abr);
+    fusionnerSommets(abr);
+    return (abr);
 }
 
 
@@ -272,36 +276,46 @@ void tailleMemoire(T_Arbre abr) {
     append_to_message_view(g_strdup_printf("Memoire d'un sommet normal: %u octets. ", tailleSommetClassique));
 }
 
-T_Arbre fusionnerSommets(T_Arbre abr) {
+void fusionnerSommets(T_Arbre abr) {
     if (abr == NULL) {
-        return NULL;
+        return;
     }
 
-    // Fusionner les sous-arbres gauche et droit
-    abr->filsGauche = fusionnerSommets(abr->filsGauche);
-    abr->filsDroit = fusionnerSommets(abr->filsDroit);
+    // Traiter le sommet actuel comme une racine
+    ItererFusion(abr, abr);
 
-    // Fusionner les sommets consécutifs à gauche
-    if (abr->filsGauche != NULL && abr->filsGauche->borneSup + 1 >= abr->borneInf) {
-        // Mettre à jour la borneInf du sommet actuel
-        abr->borneInf = abr->filsGauche->borneInf;
-
-        // Supprimer le sommet fusionné
-        T_Sommet *temp = abr->filsGauche;
-        abr->filsGauche = abr->filsGauche->filsGauche;
-        free(temp);
-    }
-
-    // Fusionner les sommets consécutifs à droite
-    if (abr->filsDroit != NULL && abr->filsDroit->borneInf <= abr->borneSup + 1) {
-        // Mettre à jour la borneSup du sommet actuel
-        abr->borneSup = abr->filsDroit->borneSup;
-
-        // Supprimer le sommet fusionné
-        T_Sommet *temp = abr->filsDroit;
-        abr->filsDroit = abr->filsDroit->filsDroit;
-        free(temp);
-    }
-
-    return abr;
+    // Récursion sur les sous-arbres gauche et droit
+    fusionnerSommets(abr->filsGauche);
+    fusionnerSommets(abr->filsDroit);
 }
+
+void ItererFusion(T_Arbre racine, T_Arbre abr) {
+    if (abr == NULL) {
+        return;
+    }
+
+    // Afficher l'intervalle si le sommet en cours peut fusionner avec la racine
+    if (abr != racine && ((abr->borneInf <= racine->borneSup + 1 && abr->borneSup >= racine->borneInf - 1) ||
+        (racine->borneInf <= abr->borneSup + 1 && racine->borneSup >= abr->borneInf - 1))) {
+            append_to_message_view(g_strdup_printf("[%d; %d]\n", abr->borneInf, abr->borneSup));
+
+            int abrborneinf = abr->borneInf;
+            int abrbornesup = abr->borneSup;
+
+            // Supprimer tous les éléments du sommet à fusionner
+            for (int i = abr->borneInf; i <= abr->borneSup; i++) {
+                racine = supprimerElement(racine, i);
+            }
+
+            int min_borne = min(racine->borneInf, abrborneinf);
+            int max_borne = max(racine->borneSup, abrbornesup);
+
+            racine->borneInf = min_borne;
+            racine->borneSup = max_borne;
+        }
+
+    // Récursion sur les sous-arbres gauche et droit
+    ItererFusion(racine, abr->filsGauche);
+    ItererFusion(racine, abr->filsDroit);
+}
+
