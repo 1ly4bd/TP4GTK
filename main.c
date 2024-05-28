@@ -129,7 +129,12 @@ static void dessiner_arbre(cairo_t *cr, T_Arbre abr, double x, double y, double 
     // Dessiner un cercle
     cairo_arc(cr, x, y, 20 * zoom_level, 0, 2 * G_PI);
 
-    cairo_set_source_rgba(cr, 0.45, 0.45, 0.45, 1); // Couleur de la bordure du cercle
+    // Définir la couleur de remplissage
+    cairo_set_source_rgba(cr, 0.2, 0.2, 0.2, 1);
+    cairo_fill_preserve(cr); // Remplir le cercle tout en préservant le chemin pour la bordure
+
+    // Couleur de la bordure du cercle
+    cairo_set_source_rgba(cr, 0.45, 0.45, 0.45, 1);
     cairo_set_line_width(cr, 3);
     cairo_stroke(cr);
 
@@ -654,8 +659,8 @@ static void show_splash_screen() {
     // Affichage de la fen�tre
     gtk_widget_show_all(splash_window);
 
-    // Temporisation pour fermer l'�cran de d�marrage apr�s quelques secondes (par exemple, 3 secondes)
-    g_timeout_add(3000, show_main_window, NULL);
+    // Temporisation pour fermer l'�cran de d�marrage apr�s quelques secondes (par exemple, 2 secondes)
+    g_timeout_add(2000, show_main_window, NULL);
 }
 
 static void activate(GtkApplication *app, gpointer user_data) {
