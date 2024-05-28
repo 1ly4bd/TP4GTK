@@ -411,6 +411,9 @@ static gboolean on_key_press_event(GtkWidget *widget, GdkEventKey *event, gpoint
         // Ctrl + Y
         avancer_etat_suivant(widget, user_data);
         return TRUE;
+    } else if ((event->state & GDK_MOD1_MASK) && (event->keyval == GDK_KEY_F4)) {
+        // Alt + F4
+        killProcess();
     }
     return FALSE;
 }
@@ -517,7 +520,7 @@ static void afficher_niveau(GtkWidget *widget, gpointer entry) {
 // Fonction pour afficher la hauteur de l'arbre
 static void afficher_hauteur(GtkWidget *widget, gpointer entry) {
     int hauteur = rechercherHauteur(abr);
-    if (hauteur > 0) {
+    if (hauteur >= 0) {
         append_to_message_view(g_strdup_printf("\n"));
         append_to_message_view(g_strdup_printf("Hauteur de l'arbre : %d.\n", hauteur));
     } else {
@@ -791,6 +794,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_widget_override_background_color(text_view, GTK_STATE_FLAG_NORMAL, &transparent);
 
     g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press_event), NULL);
+    g_signal_connect(window, "destroy", G_CALLBACK(killProcess), NULL);
 
     // Charger le fichier CSS
     GtkCssProvider *provider;

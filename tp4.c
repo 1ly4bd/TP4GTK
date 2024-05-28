@@ -73,7 +73,7 @@ T_Sommet* rechercherPere(T_Arbre abr, int element) {
     // Si l'élément est inférieur à la borneInf du sommet actuel, recherche dans le sous-arbre gauche
     if (element < abr->borneInf) {
         return rechercherPere(abr->filsGauche, element);
-    } 
+    }
     // Si l'élément est supérieur à la borneSup du sommet actuel, recherche dans le sous-arbre droit
     else if (element > abr->borneSup) {
         return rechercherPere(abr->filsDroit, element);
@@ -101,7 +101,7 @@ int niveauDuSommet(T_Arbre racine, T_Sommet *sommet) {
 
 int rechercherHauteur(T_Arbre abr) {
     if (abr == NULL) {
-        return 0;
+        return -1;
     }
 
     int hauteurGauche = rechercherHauteur(abr->filsGauche);
