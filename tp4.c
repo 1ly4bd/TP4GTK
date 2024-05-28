@@ -229,7 +229,7 @@ T_Arbre supprimerElement(T_Arbre abr, int element) {
                         nouveauGauche = insererElement(nouveauGauche, x);
                     }
                 }
-                 // Vérifier si abr n'est pas nul avant de le libérer
+                 // Vérifier si abr n'est pas nul avant de le libérer (la fusion pouvait provoquer des problèmes d'accès à la mémoire qui faisait planter l'app)
                 if (abr != NULL) {
                     free(abr);
                 }
