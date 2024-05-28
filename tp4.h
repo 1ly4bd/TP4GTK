@@ -36,6 +36,5 @@ unsigned int tailleMemoireClassique(T_Arbre abr);
 void tailleMemoire(T_Arbre abr);
 void fusionnerSommets(T_Arbre abr);
 void ItererFusion(T_Arbre racine, T_Arbre abr);
-void libererSommet(T_Sommet *sommet);
 
 #endif /* TP4_H */
