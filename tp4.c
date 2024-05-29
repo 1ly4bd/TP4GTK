@@ -283,12 +283,16 @@ void fusionnerSommets(T_Arbre abr) {
         return;
     }
 
+    // Fusionner les sous-arbres gauche et droit s'ils existent
+    if (abr->filsGauche != NULL) {
+        fusionnerSommets(abr->filsGauche);
+    }
+    if (abr->filsDroit != NULL) {
+        fusionnerSommets(abr->filsDroit);
+    }
+
     // Traiter le sommet actuel comme une racine
     ItererFusion(abr, abr);
-
-    // Récursion sur les sous-arbres gauche et droit
-    fusionnerSommets(abr->filsGauche);
-    fusionnerSommets(abr->filsDroit);
 }
 
 void ItererFusion(T_Arbre racine, T_Arbre abr) {
@@ -296,28 +300,33 @@ void ItererFusion(T_Arbre racine, T_Arbre abr) {
         return;
     }
 
-    // Fusion si le sommet en cours peut fusionner avec la racine
+    // Fusionner si le sommet en cours peut fusionner avec la racine
     if (abr != racine && ((abr->borneInf <= racine->borneSup + 1 && abr->borneSup >= racine->borneInf - 1) ||
         (racine->borneInf <= abr->borneSup + 1 && racine->borneSup >= abr->borneInf - 1))) {
 
-            int abrborneinf = abr->borneInf;
-            int abrbornesup = abr->borneSup;
+        int abrborneinf = abr->borneInf;
+        int abrbornesup = abr->borneSup;
 
-            // Supprimer tous les éléments du sommet à fusionner
-            for (int i = abr->borneInf; i <= abr->borneSup; i++) {
-                racine = supprimerElement(racine, i);
-            }
-
-            // Définir les nouvelles bornes de la racine
-            int min_borne = min(racine->borneInf, abrborneinf);
-            int max_borne = max(racine->borneSup, abrbornesup);
-
-            racine->borneInf = min_borne;
-            racine->borneSup = max_borne;
+        // Supprimer tous les éléments du sommet à fusionner
+        for (int i = abr->borneInf; i <= abr->borneSup; i++) {
+            racine = supprimerElement(racine, i);
         }
 
-    // Récursion sur les sous-arbres gauche et droit
-    ItererFusion(racine, abr->filsGauche);
-    ItererFusion(racine, abr->filsDroit);
+        // Définir les nouvelles bornes de la racine en utilisant le #define max et min
+        int min_borne = min(racine->borneInf, abrborneinf);
+        int max_borne = max(racine->borneSup, abrbornesup);
+
+        racine->borneInf = min_borne;
+        racine->borneSup = max_borne;
+    }
+
+    // Récursion sur les sous-arbres gauche et droit s'ils existent
+    if (abr->filsGauche != NULL) {
+        ItererFusion(racine, abr->filsGauche);
+    }
+    if (abr->filsDroit != NULL) {
+        ItererFusion(racine, abr->filsDroit);
+    }
 }
+
 
