@@ -34,6 +34,9 @@ GtkWidget *vbox;
 GtkWidget *hbox;
 GtkWidget *button;
 GtkWidget *entry;
+GtkCssProvider *provider;
+GdkDisplay *display;
+GdkScreen *screen;
 
 // Structure pour représenter un nœud graphique
 typedef struct {
@@ -553,19 +556,6 @@ static void reinitialiser_arbre(GtkWidget *widget, gpointer data) {
     append_to_message_view(g_strdup_printf("Arbre reinitialise.\n"));
 }
 
-void cleanup() {
-    // Lib�rer la m�moire allou�e dynamiquement
-    if (previous_abrs != NULL) {
-        g_array_free(previous_abrs, TRUE);
-    }
-    if (next_abrs != NULL) {
-        g_array_free(next_abrs, TRUE);
-    }
-    if (abr != NULL) {
-        supprimerArbre(abr);
-    }
-}
-
 // D�claration de la fen�tre pour l'�cran de d�marrage
 GtkWidget *splash_window = NULL;
 GtkWidget *spinner;
@@ -657,6 +647,47 @@ static void show_splash_screen() {
 
     // Temporisation pour fermer l'�cran de d�marrage apr�s quelques secondes (par exemple, 2 secondes)
     g_timeout_add(2000, show_main_window, NULL);
+}
+
+void cleanup() {
+    // Lib�rer la m�moire allou�e dynamiquement
+    if (previous_abrs != NULL) {
+        g_array_free(previous_abrs, TRUE);
+    }
+    if (next_abrs != NULL) {
+        g_array_free(next_abrs, TRUE);
+    }
+    if (abr != NULL) {
+        supprimerArbre(abr);
+    }
+     if (provider != NULL) {
+        g_object_unref(provider);
+        provider = NULL;
+    }
+    if (splash_window != NULL) {
+        gtk_widget_destroy(splash_window);
+        splash_window = NULL;
+    }
+    if (text_view != NULL) {
+        g_object_unref(text_view);
+        text_view = NULL;
+    }
+    if (noeudsGraphiques != NULL) {
+        g_array_free(noeudsGraphiques, TRUE);
+        noeudsGraphiques = NULL;
+    }
+    if (scrolled_window != NULL) {
+        g_object_unref(scrolled_window);
+        scrolled_window = NULL;
+    }
+    if (zoom_level_label != NULL) {
+        g_object_unref(zoom_level_label);
+        zoom_level_label = NULL;
+    }
+    if (reset_zoom_button != NULL) {
+        g_object_unref(reset_zoom_button);
+        reset_zoom_button = NULL;
+    }
 }
 
 static void activate(GtkApplication *app, gpointer user_data) {
@@ -800,10 +831,6 @@ static void activate(GtkApplication *app, gpointer user_data) {
     #endif
 
     // Charger le fichier CSS
-    GtkCssProvider *provider;
-    GdkDisplay *display;
-    GdkScreen *screen;
-
     provider = gtk_css_provider_new();
     display = gdk_display_get_default();
     screen = gdk_display_get_default_screen(display);
@@ -811,6 +838,8 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_css_provider_load_from_path(provider, "gtkgui.css", NULL);
 
     gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+    g_object_unref(provider); // Libérer le CSS provider après utilisation
 
     // Afficher l'�cran de d�marrage qui va ensuite afficher la fenetre principale
     show_splash_screen();
