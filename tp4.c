@@ -308,7 +308,7 @@ void ItererFusion(T_Arbre racine, T_Arbre abr) {
                 racine = supprimerElement(racine, i);
             }
 
-            // Définir les nouvelles bornes de la racine en utilisant le #define max et min
+            // Définir les nouvelles bornes de la racine
             int min_borne = min(racine->borneInf, abrborneinf);
             int max_borne = max(racine->borneSup, abrbornesup);
 

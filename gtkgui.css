@@ -42,19 +42,18 @@ entry:focus {
     border-radius: 5px;
 }
 
-/* Zone de texte */
 textview {
-    background-color: #3c3c3c; /* Fond de couleur sombre */
-    color: #ffffff; /* Texte en blanc */
-    border: 1px solid #555555; /* Bordure nette */
+    background-color: #3c3c3c;
+    color: #ffffff;
+    border: 1px solid #555555;
     border-radius: 2px;
     padding: 5px;
     font-size: 14px;
 }
 
-/* Texte à l'intérieur de la zone de texte */
+
 textview text {
-    color: #ffffff; /* Texte en blanc */
+    color: #ffffff;
 }
 
 frame {

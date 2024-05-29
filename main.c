@@ -568,10 +568,12 @@ void cleanup() {
 
 // D�claration de la fen�tre pour l'�cran de d�marrage
 GtkWidget *splash_window = NULL;
+GtkWidget *spinner;
 
 // Fonction pour masquer ou fermer l'�cran de d�marrage
 static void hide_splash_screen() {
     if (splash_window != NULL) {
+        gtk_spinner_stop(GTK_SPINNER(spinner));
         gtk_widget_destroy(splash_window);
         splash_window = NULL;
     }
@@ -591,7 +593,6 @@ static gboolean show_main_window(gpointer user_data) {
 
 // Fonction pour cr�er et afficher l'�cran de d�marrage
 static void show_splash_screen() {
-    GtkWidget *spinner;
     // Cr�ation de la fen�tre
     splash_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_decorated(GTK_WINDOW(splash_window), FALSE); // Supprimer la d�coration de la fen�tre
@@ -627,7 +628,7 @@ static void show_splash_screen() {
     // Ajout de l'image � la bo�te horizontale
     gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
 
-    // Ajout du label "Chargement en cours..." et agrandissement de la taille de la police
+    // Ajout du label "Chargement en cours" et agrandissement de la taille de la police
     GtkWidget *label = gtk_label_new("Chargement en cours");
     PangoFontDescription *font_desc = pango_font_description_from_string("Segoe UI 24"); // Agrandir la taille de la police
     gtk_widget_override_font(label, font_desc);
